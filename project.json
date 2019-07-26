@@ -1,0 +1,7 @@
+{
+    "github": "bradrydzewski/my-app",
+    "docker": "bradrydzewski/my-app",
+    "app": "my-app",
+    "parent": "Employee",
+    "child": "Computer"
+}
