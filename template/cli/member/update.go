@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package member
 
@@ -19,9 +8,9 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/{{github}}/cli/util"
-	"github.com/{{github}}/types"
-	"github.com/{{github}}/types/enum"
+	"github.com/{{toLower repo}}/cli/util"
+	"github.com/{{toLower repo}}/types"
+	"github.com/{{toLower repo}}/types/enum"
 
 	"github.com/drone/funcmap"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -41,7 +30,7 @@ func (c *updateCommand) run(*kingpin.ParseContext) error {
 	}
 
 	in := new(types.MembershipInput)
-	in.Project = c.proj
+	in.{{title project}} = c.proj
 	in.User = c.user
 	switch c.role {
 	case "admin":
@@ -65,10 +54,10 @@ func (c *updateCommand) run(*kingpin.ParseContext) error {
 func registerUpdate(app *kingpin.CmdClause) {
 	c := new(updateCommand)
 
-	cmd := app.Command("update", "update a project").
+	cmd := app.Command("update", "update a {{toLower project}}").
 		Action(c.run)
 
-	cmd.Arg("project", "project id").
+	cmd.Arg("{{toLower project}}", "{{toLower project}} id").
 		Required().
 		Int64Var(&c.proj)
 

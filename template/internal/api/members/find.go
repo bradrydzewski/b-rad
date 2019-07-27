@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package members
 
@@ -19,27 +8,27 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/{{github}}/internal/api/render"
-	"github.com/{{github}}/internal/logger"
-	"github.com/{{github}}/internal/store"
+	"github.com/{{toLower repo}}/internal/api/render"
+	"github.com/{{toLower repo}}/internal/logger"
+	"github.com/{{toLower repo}}/internal/store"
 
 	"github.com/go-chi/chi"
 )
 
 // HandleFind returns an http.HandlerFunc that writes a json-encoded
-// project members details to the response body.
+// {{toLower project}} members details to the response body.
 func HandleFind(
 	users store.UserStore,
-	projects store.ProjectStore,
+	{{toLower project}}s store.{{title project}}Store,
 	members store.MemberStore,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.ParseInt(chi.URLParam(r, "project"), 10, 64)
+		id, err := strconv.ParseInt(chi.URLParam(r, "{{toLower project}}"), 10, 64)
 		if err != nil {
 			render.BadRequest(w, err)
 			logger.FromRequest(r).
 				WithError(err).
-				Debugln("cannot parse project id")
+				Debugln("cannot parse {{toLower project}} id")
 			return
 		}
 
@@ -50,7 +39,7 @@ func HandleFind(
 			logger.FromRequest(r).
 				WithError(err).
 				WithField("user", key).
-				WithField("project", id).
+				WithField("{{toLower project}}", id).
 				Debugln("user not found")
 			return
 		}
@@ -60,7 +49,7 @@ func HandleFind(
 			logger.FromRequest(r).
 				WithError(err).
 				WithField("user", key).
-				WithField("project", id).
+				WithField("{{toLower project}}", id).
 				Debugln("membership not found")
 			return
 		}

@@ -1,65 +1,54 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package swagger
 
 import (
 	"net/http"
 
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/types"
 )
 
-// swagger:route GET /projects/{project}/members/{user} member getMember
+// swagger:route GET /{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members/{user} member getMember
 //
-// Get the project member with the matching email address.
+// Get the {{toLower project}} member with the matching email address.
 //
 //     Responses:
 //       200: member
 //
 func memberFind(w http.ResponseWriter, r *http.Request) {}
 
-// swagger:route GET  /projects/{project}/members member getMemberList
+// swagger:route GET  /{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members member getMemberList
 //
-// Get the list of all project members.
+// Get the list of all {{toLower project}} members.
 //
 //     Responses:
 //       200: memberList
 //
 func memberList(w http.ResponseWriter, r *http.Request) {}
 
-// swagger:route POST /projects/{project}/members member createMember
+// swagger:route POST /{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members member createMember
 //
-// Create a new project member.
+// Create a new {{toLower project}} member.
 //
 //     Responses:
 //       200: member
 //
 func memberCreate(w http.ResponseWriter, r *http.Request) {}
 
-// swagger:route PATCH /projects/{project}/members/{user} member updateMember
+// swagger:route PATCH /{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members/{user} member updateMember
 //
-// Update the project member.
+// Update the {{toLower project}} member.
 //
 //     Responses:
 //       200: member
 //
 func memberUpdate(w http.ResponseWriter, r *http.Request) {}
 
-// swagger:route DELETE /projects/{project}/members/{user} member deleteMember
+// swagger:route DELETE /{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members/{user} member deleteMember
 //
-// Delete the project member.
+// Delete the {{toLower project}} member.
 //
 //     Responses:
 //       204:
@@ -69,7 +58,7 @@ func memberDelete(w http.ResponseWriter, r *http.Request) {}
 // swagger:parameters getMember deleteMember
 type memberReq struct {
 	// in: path
-	Project int64 `json:"project"`
+	{{title project}} int64 `json:"{{toLower project}}"`
 
 	// in: path
 	Email string `json:"user"`
@@ -78,13 +67,13 @@ type memberReq struct {
 // swagger:parameters getMemberList
 type memberListReq struct {
 	// in: path
-	Project int64 `json:"project"`
+	{{title project}} int64 `json:"{{toLower project}}"`
 }
 
 // swagger:parameters createMember
 type memberCreateReq struct {
 	// in: path
-	Project int64 `json:"project"`
+	{{title project}} int64 `json:"{{toLower project}}"`
 
 	// in: body
 	Body types.MembershipInput
@@ -93,7 +82,7 @@ type memberCreateReq struct {
 // swagger:parameters updateMember
 type memberUpdateReq struct {
 	// in: path
-	Project int64 `json:"project"`
+	{{title project}} int64 `json:"{{toLower project}}"`
 
 	// in: path
 	Email string `json:"user"`

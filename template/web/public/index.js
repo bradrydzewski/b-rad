@@ -4,14 +4,15 @@ import { SWRConfig } from "swr";
 
 import { ProvideSession, useSession } from "./hooks/session.js";
 
-import Account from "./pages/account.js";
-import Home from "./pages/home.js";
-import Login from "./pages/login.js";
-import Project from "./pages/project.js";
-import Register from "./pages/register.js";
-import Users from "./pages/users.js";
+import Account from "./pages/account/account.js";
+import Home from "./pages/{{toLower project}}s/{{toLower project}}s.js";
+import Login from "./pages/login/login.js";
+import {{title project}} from "./pages/{{toLower project}}/{{toLower project}}.js";
+import Register from "./pages/register/register.js";
+import Users from "./pages/users/users.js";
 
 import Shell from "./shared/layouts/shell/shell.js";
+import { SimpleRoute, ComplexRoute } from "./shared/router/router";
 import Guest from "./shared/layouts/login.js";
 
 // TODO remove me
@@ -39,24 +40,22 @@ export default function App() {
 
 	return (
 		<>
-			<Shell session={session}>
-				<SWRConfig value={{`{{`}} fetcher {{`}}`}}>
-					<Switch>
-						<Route path="/" component={Home} />
-						<Route path="/users" component={Users} />
-						<Route path="/projects/:project" component={Project} />
-						<Route path="/projects/:project/:path+" component={Project} />
-						<Route path="/account" component={Account} />
-						<Route path="/login">
-							<Redirect to={"/"} />
-						</Route>
-						<Route path="/register">
-							<Redirect to={"/"} />
-						</Route>
-						<Route>Not Found</Route>
-					</Switch>
-				</SWRConfig>
-			</Shell>
+			<SWRConfig value={{`{{`}} fetcher {{`}}`}}>
+				<Switch>
+					<SimpleRoute path="/" content={Home} />
+					<SimpleRoute path="/users" content={Users} />
+					<SimpleRoute path="/account" content={Account} />
+					<ComplexRoute path="/{{toLower project}}s/:{{toLower project}}" content={{`{`}}{{title project}}{{`}`}} />
+					<ComplexRoute path="/{{toLower project}}s/:{{toLower project}}/:path+" content={{`{`}}{{title project}}{{`}`}} />
+					<Route path="/login">
+						<Redirect to={"/"} />
+					</Route>
+					<Route path="/register">
+						<Redirect to={"/"} />
+					</Route>
+					<Route>Not Found</Route>
+				</Switch>
+			</SWRConfig>
 		</>
 	);
 }

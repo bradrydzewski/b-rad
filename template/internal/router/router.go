@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 // Package router provides http handlers for serving the
 // web applicationa and API endpoints.
@@ -20,23 +9,22 @@ package router
 import (
 	"context"
 	"net/http"
-	"path/filepath"
 
-	"github.com/{{github}}/internal/api/access"
-	"github.com/{{github}}/internal/api/{{toLower child}}s"
-	"github.com/{{github}}/internal/api/{{toLower parent}}s"
-	"github.com/{{github}}/internal/api/login"
-	"github.com/{{github}}/internal/api/members"
-	"github.com/{{github}}/internal/api/projects"
-	"github.com/{{github}}/internal/api/register"
-	"github.com/{{github}}/internal/api/system"
-	"github.com/{{github}}/internal/api/token"
-	"github.com/{{github}}/internal/api/user"
-	"github.com/{{github}}/internal/api/users"
-	"github.com/{{github}}/internal/logger"
-	"github.com/{{github}}/internal/store"
-	"github.com/{{github}}/internal/swagger"
-	"github.com/{{github}}/web/dist"
+	"github.com/{{toLower repo}}/internal/api/access"
+	"github.com/{{toLower repo}}/internal/api/{{toLower parent}}s"
+	"github.com/{{toLower repo}}/internal/api/login"
+	"github.com/{{toLower repo}}/internal/api/members"
+	"github.com/{{toLower repo}}/internal/api/{{toLower project}}s"
+	"github.com/{{toLower repo}}/internal/api/register"
+	"github.com/{{toLower repo}}/internal/api/{{toLower child}}s"
+	"github.com/{{toLower repo}}/internal/api/system"
+	"github.com/{{toLower repo}}/internal/api/token"
+	"github.com/{{toLower repo}}/internal/api/user"
+	"github.com/{{toLower repo}}/internal/api/users"
+	"github.com/{{toLower repo}}/internal/logger"
+	"github.com/{{toLower repo}}/internal/store"
+	"github.com/{{toLower repo}}/internal/swagger"
+	"github.com/{{toLower repo}}/web/dist"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -50,10 +38,10 @@ var nocontext = context.Background()
 // New returns a new http.Handler that routes traffic
 // to the appropriate http.Handlers.
 func New(
-	{{toLower child}}Store store.{{child}}Store,
-	{{toLower parent}}Store store.{{parent}}Store,
+	{{toLower child}}Store store.{{title child}}Store,
+	{{toLower parent}}Store store.{{title parent}}Store,
 	memberStore store.MemberStore,
-	projectStore store.ProjectStore,
+	{{toLower project}}Store store.{{title project}}Store,
 	userStore store.UserStore,
 	systemStore store.SystemStore,
 ) http.Handler {
@@ -86,18 +74,18 @@ func New(
 		)
 		r.Use(cors.Handler)
 
-		// project endpoints
-		r.Route("/projects", func(r chi.Router) {
+		// {{toLower project}} endpoints
+		r.Route("/{{toLower project}}s", func(r chi.Router) {
 			r.Use(auth)
-			r.Post("/", projects.HandleCreate(projectStore, memberStore))
+			r.Post("/", {{toLower project}}s.HandleCreate({{toLower project}}Store, memberStore))
 
-			// project endpoints
-			r.Route("/{project}", func(r chi.Router) {
-				r.Use(access.ProjectAccess(memberStore))
+			// {{toLower project}} endpoints
+			r.Route("/{{`{`}}{{toLower project}}{{`}`}}", func(r chi.Router) {
+				r.Use(access.{{title project}}Access(memberStore))
 
-				r.Get("/", projects.HandleFind(projectStore))
-				r.Patch("/", projects.HandleUpdate(projectStore))
-				r.Delete("/", projects.HandleDelete(projectStore))
+				r.Get("/", {{toLower project}}s.HandleFind({{toLower project}}Store, memberStore))
+				r.Patch("/", {{toLower project}}s.HandleUpdate({{toLower project}}Store))
+				r.Delete("/", {{toLower project}}s.HandleDelete({{toLower project}}Store))
 
 				// {{toLower parent}} endpoints
 				r.Route("/{{toLower parent}}s", func(r chi.Router) {
@@ -106,7 +94,7 @@ func New(
 					r.Get("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleFind({{toLower parent}}Store))
 					r.Patch("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleUpdate({{toLower parent}}Store))
 					r.With(
-						access.ProjectAdmin(memberStore),
+						access.{{title project}}Admin(memberStore),
 					).Delete("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleDelete({{toLower parent}}Store))
 
 					// {{toLower child}} endpoints
@@ -116,20 +104,20 @@ func New(
 						r.Get("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleFind({{toLower parent}}Store, {{toLower child}}Store))
 						r.Patch("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleUpdate({{toLower parent}}Store, {{toLower child}}Store))
 						r.With(
-							access.ProjectAdmin(memberStore),
+							access.{{title project}}Admin(memberStore),
 						).Delete("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleDelete({{toLower parent}}Store, {{toLower child}}Store))
 					})
 				})
 
-				// project member endpoints
+				// {{toLower project}} member endpoints
 				r.Route("/members", func(r chi.Router) {
-					r.Use(access.ProjectAdmin(memberStore))
+					r.Use(access.{{title project}}Admin(memberStore))
 
-					r.Get("/", members.HandleList(projectStore, memberStore))
-					r.Get("/{user}", members.HandleFind(userStore, projectStore, memberStore))
-					r.Post("/{user}", members.HandleCreate(userStore, projectStore, memberStore))
-					r.Patch("/{user}", members.HandleUpdate(userStore, projectStore, memberStore))
-					r.Delete("/{user}", members.HandleDelete(userStore, projectStore, memberStore))
+					r.Get("/", members.HandleList({{toLower project}}Store, memberStore))
+					r.Get("/{user}", members.HandleFind(userStore, {{toLower project}}Store, memberStore))
+					r.Post("/{user}", members.HandleCreate(userStore, {{toLower project}}Store, memberStore))
+					r.Patch("/{user}", members.HandleUpdate(userStore, {{toLower project}}Store, memberStore))
+					r.Delete("/{user}", members.HandleDelete(userStore, {{toLower project}}Store, memberStore))
 				})
 			})
 		})
@@ -139,8 +127,8 @@ func New(
 			r.Use(auth)
 
 			r.Get("/", user.HandleFind())
-			r.Get("/projects", user.HandleProjects(projectStore))
-			r.Patch("/user", user.HandleUpdate(userStore))
+			r.Patch("/", user.HandleUpdate(userStore))
+			r.Get("/{{toLower project}}s", user.Handle{{title project}}s({{toLower project}}Store))
 			r.Post("/token", user.HandleToken(userStore))
 		})
 
@@ -170,9 +158,8 @@ func New(
 	})
 
 	// serve swagger for embedded filesystem.
-	swaggerFS := http.FileServer(swagger.FileSystem())
 	r.Handle("/swagger", http.RedirectHandler("/swagger/", http.StatusSeeOther))
-	r.Handle("/swagger/*", http.StripPrefix("/swagger/", swaggerFS))
+	r.Handle("/swagger/*", http.StripPrefix("/swagger/", swagger.Handler()))
 
 	// create middleware to enforce security best practices.
 	sec := secure.New(
@@ -196,21 +183,8 @@ func New(
 	)
 
 	// serve all other routes from the embedded filesystem.
-	fs := http.FileServer(dist.FileSystem())
 	r.With(sec.Handler).NotFound(
-		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// because this is a single page application,
-			// we need to always load the index.html file
-			// in the root of the project, unless the path
-			// points to a file with an extension (css, js, etc)
-			if filepath.Ext(r.URL.Path) == "" {
-				// HACK: alter the path to point to the
-				// root of the project.
-				r.URL.Path = "/"
-			}
-			// and finally server the file.
-			fs.ServeHTTP(w, r)
-		}),
+		dist.Handler(),
 	)
 
 	return r

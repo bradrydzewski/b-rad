@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package client
 
@@ -24,7 +13,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/types"
 )
 
 // ensure HTTPClient implements Client interface.
@@ -147,44 +136,44 @@ func (c *HTTPClient) UserDelete(key string) error {
 }
 
 //
-// Project endpoints
+// {{title project}} endpoints
 //
 
-// Project returns a project by ID.
-func (c *HTTPClient) Project(id int64) (*types.Project, error) {
-	out := new(types.Project)
-	uri := fmt.Sprintf("%s/api/v1/projects/%d", c.base, id)
+// {{title project}} returns a {{toLower project}} by ID.
+func (c *HTTPClient) {{title project}}(id int64) (*types.{{title project}}, error) {
+	out := new(types.{{title project}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d", c.base, id)
 	err := c.get(uri, out)
 	return out, err
 }
 
-// ProjectList returns a list of all projects.
-func (c *HTTPClient) ProjectList() ([]*types.Project, error) {
-	out := []*types.Project{}
-	uri := fmt.Sprintf("%s/api/v1/user/projects", c.base)
+// {{title project}}List returns a list of all {{toLower project}}s.
+func (c *HTTPClient) {{title project}}List() ([]*types.{{title project}}, error) {
+	out := []*types.{{title project}}{}
+	uri := fmt.Sprintf("%s/api/v1/user/{{toLower project}}s", c.base)
 	err := c.get(uri, &out)
 	return out, err
 }
 
-// ProjectCreate creates a new project.
-func (c *HTTPClient) ProjectCreate(project *types.Project) (*types.Project, error) {
-	out := new(types.Project)
-	uri := fmt.Sprintf("%s/api/v1/projects", c.base)
-	err := c.post(uri, project, out)
+// {{title project}}Create creates a new {{toLower project}}.
+func (c *HTTPClient) {{title project}}Create({{toLower project}} *types.{{title project}}) (*types.{{title project}}, error) {
+	out := new(types.{{title project}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s", c.base)
+	err := c.post(uri, {{toLower project}}, out)
 	return out, err
 }
 
-// ProjectUpdate updates a project.
-func (c *HTTPClient) ProjectUpdate(id int64, user *types.ProjectInput) (*types.Project, error) {
-	out := new(types.Project)
-	uri := fmt.Sprintf("%s/api/v1/projects", c.base)
+// {{title project}}Update updates a {{toLower project}}.
+func (c *HTTPClient) {{title project}}Update(id int64, user *types.{{title project}}Input) (*types.{{title project}}, error) {
+	out := new(types.{{title project}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s", c.base)
 	err := c.patch(uri, user, out)
 	return out, err
 }
 
-// ProjectDelete deletes a project.
-func (c *HTTPClient) ProjectDelete(id int64) error {
-	uri := fmt.Sprintf("%s/api/v1/projects/%d", c.base, id)
+// {{title project}}Delete deletes a {{toLower project}}.
+func (c *HTTPClient) {{title project}}Delete(id int64) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d", c.base, id)
 	err := c.delete(uri)
 	return err
 }
@@ -194,126 +183,126 @@ func (c *HTTPClient) ProjectDelete(id int64) error {
 //
 
 // Member returns a membrer by ID.
-func (c *HTTPClient) Member(project int64, user string) (*types.Member, error) {
+func (c *HTTPClient) Member({{toLower project}} int64, user string) (*types.Member, error) {
 	out := new(types.Member)
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/members/%s", c.base, project, user)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, {{toLower project}}, user)
 	err := c.get(uri, out)
 	return out, err
 }
 
-// MemberList returns a list of all project members.
-func (c *HTTPClient) MemberList(project int64) ([]*types.Member, error) {
+// MemberList returns a list of all {{toLower project}} members.
+func (c *HTTPClient) MemberList({{toLower project}} int64) ([]*types.Member, error) {
 	out := []*types.Member{}
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/members", c.base, project)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members", c.base, {{toLower project}})
 	err := c.get(uri, &out)
 	return out, err
 }
 
-// MemberCreate creates a new project member.
+// MemberCreate creates a new {{toLower project}} member.
 func (c *HTTPClient) MemberCreate(member *types.MembershipInput) (*types.Member, error) {
 	out := new(types.Member)
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/members/%s", c.base, member.Project, member.User)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, member.{{title project}}, member.User)
 	err := c.post(uri, member, out)
 	return out, err
 }
 
-// MemberUpdate updates a project member.
+// MemberUpdate updates a {{toLower project}} member.
 func (c *HTTPClient) MemberUpdate(member *types.MembershipInput) (*types.Member, error) {
 	out := new(types.Member)
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/members/%s", c.base, member.Project, member.User)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, member.{{title project}}, member.User)
 	err := c.patch(uri, member, out)
 	return out, err
 }
 
-// MemberDelete deletes a project member.
-func (c *HTTPClient) MemberDelete(project int64, user string) error {
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/members/%s", c.base, project, user)
+// MemberDelete deletes a {{toLower project}} member.
+func (c *HTTPClient) MemberDelete({{toLower project}} int64, user string) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, {{toLower project}}, user)
 	err := c.delete(uri)
 	return err
 }
 
 //
-// {{parent}} endpoints
+// {{title parent}} endpoints
 //
 
-// {{parent}} returns a {{toLower parent}} by ID.
-func (c *HTTPClient) {{parent}}(project, id int64) (*types.{{parent}}, error) {
-	out := new(types.{{parent}})
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d", c.base, project, id)
+// {{title parent}} returns a {{toLower parent}} by ID.
+func (c *HTTPClient) {{title parent}}({{toLower project}}, id int64) (*types.{{title parent}}, error) {
+	out := new(types.{{title parent}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d", c.base, {{toLower project}}, id)
 	err := c.get(uri, out)
 	return out, err
 }
 
-// {{parent}}List returns a list of all {{toLower parent}}s by project id.
-func (c *HTTPClient) {{parent}}List(project int64) ([]*types.{{parent}}, error) {
-	out := []*types.{{parent}}{}
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s", c.base, project)
+// {{title parent}}List returns a list of all {{toLower parent}}s by {{toLower project}} id.
+func (c *HTTPClient) {{title parent}}List({{toLower project}} int64) ([]*types.{{title parent}}, error) {
+	out := []*types.{{title parent}}{}
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s", c.base, {{toLower project}})
 	err := c.get(uri, &out)
 	return out, err
 }
 
-// {{parent}}Create creates a new {{toLower parent}}.
-func (c *HTTPClient) {{parent}}Create(project int64, {{toLower parent}} *types.{{parent}}) (*types.{{parent}}, error) {
-	out := new(types.{{parent}})
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s", c.base, project)
+// {{title parent}}Create creates a new {{toLower parent}}.
+func (c *HTTPClient) {{title parent}}Create({{toLower project}} int64, {{toLower parent}} *types.{{title parent}}) (*types.{{title parent}}, error) {
+	out := new(types.{{title parent}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s", c.base, {{toLower project}})
 	err := c.post(uri, {{toLower parent}}, out)
 	return out, err
 }
 
-// {{parent}}Update updates a {{toLower parent}}.
-func (c *HTTPClient) {{parent}}Update(project, id int64, {{toLower parent}} *types.{{parent}}Input) (*types.{{parent}}, error) {
-	out := new(types.{{parent}})
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d", c.base, project, id)
+// {{title parent}}Update updates a {{toLower parent}}.
+func (c *HTTPClient) {{title parent}}Update({{toLower project}}, id int64, {{toLower parent}} *types.{{title parent}}Input) (*types.{{title parent}}, error) {
+	out := new(types.{{title parent}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d", c.base, {{toLower project}}, id)
 	err := c.patch(uri, {{toLower parent}}, out)
 	return out, err
 }
 
-// {{parent}}Delete deletes a {{toLower parent}}.
-func (c *HTTPClient) {{parent}}Delete(project, id int64) error {
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d", c.base, project, id)
+// {{title parent}}Delete deletes a {{toLower parent}}.
+func (c *HTTPClient) {{title parent}}Delete({{toLower project}}, id int64) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d", c.base, {{toLower project}}, id)
 	err := c.delete(uri)
 	return err
 }
 
 //
-// {{child}} endpoints
+// {{title child}} endpoints
 //
 
-// {{child}} returns a {{toLower child}} by ID.
-func (c *HTTPClient) {{child}}(project, {{toLower parent}}, {{toLower child}} int64) (*types.{{child}}, error) {
-	out := new(types.{{child}})
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, project, {{toLower parent}}, {{toLower child}})
+// {{title child}} returns a {{toLower child}} by ID.
+func (c *HTTPClient) {{title child}}({{toLower project}}, {{toLower parent}}, {{toLower child}} int64) (*types.{{title child}}, error) {
+	out := new(types.{{title child}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
 	err := c.get(uri, out)
 	return out, err
 }
 
-// {{child}}List returns a list of all {{toLower child}}s by project id.
-func (c *HTTPClient) {{child}}List(project, {{toLower parent}} int64) ([]*types.{{child}}, error) {
-	out := []*types.{{child}}{}
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d/{{toLower child}}s", c.base, project, {{toLower parent}})
+// {{title child}}List returns a list of all {{toLower child}}s by {{toLower project}} id.
+func (c *HTTPClient) {{title child}}List({{toLower project}}, {{toLower parent}} int64) ([]*types.{{title child}}, error) {
+	out := []*types.{{title child}}{}
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s", c.base, {{toLower project}}, {{toLower parent}})
 	err := c.get(uri, &out)
 	return out, err
 }
 
-// {{child}}Create creates a new {{toLower child}}.
-func (c *HTTPClient) {{child}}Create(project, {{toLower parent}} int64, input *types.{{child}}) (*types.{{child}}, error) {
-	out := new(types.{{child}})
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d/{{toLower child}}s", c.base, project, {{toLower parent}})
+// {{title child}}Create creates a new {{toLower child}}.
+func (c *HTTPClient) {{title child}}Create({{toLower project}}, {{toLower parent}} int64, input *types.{{title child}}) (*types.{{title child}}, error) {
+	out := new(types.{{title child}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s", c.base, {{toLower project}}, {{toLower parent}})
 	err := c.post(uri, input, out)
 	return out, err
 }
 
-// {{child}}Update updates a {{toLower child}}.
-func (c *HTTPClient) {{child}}Update(project, {{toLower parent}}, {{toLower child}} int64, input *types.{{child}}Input) (*types.{{child}}, error) {
-	out := new(types.{{child}})
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, project, {{toLower parent}}, {{toLower child}})
+// {{title child}}Update updates a {{toLower child}}.
+func (c *HTTPClient) {{title child}}Update({{toLower project}}, {{toLower parent}}, {{toLower child}} int64, input *types.{{title child}}Input) (*types.{{title child}}, error) {
+	out := new(types.{{title child}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
 	err := c.patch(uri, input, out)
 	return out, err
 }
 
-// {{child}}Delete deletes a {{toLower child}}.
-func (c *HTTPClient) {{child}}Delete(project, {{toLower parent}}, {{toLower child}} int64) error {
-	uri := fmt.Sprintf("%s/api/v1/projects/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, project, {{toLower parent}}, {{toLower child}})
+// {{title child}}Delete deletes a {{toLower child}}.
+func (c *HTTPClient) {{title child}}Delete({{toLower project}}, {{toLower parent}}, {{toLower child}} int64) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
 	err := c.delete(uri)
 	return err
 }

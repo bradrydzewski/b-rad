@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package database
 
@@ -19,8 +8,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/{{github}}/types"
-	"github.com/{{github}}/types/enum"
+	"github.com/{{toLower repo}}/types"
+	"github.com/{{toLower repo}}/types/enum"
 )
 
 func TestMembershipFind(t *testing.T) {
@@ -41,7 +30,7 @@ func TestMembershipFind(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if got, want := result.Project, int64(1); want != got {
+	if got, want := result.{{title project}}, int64(1); want != got {
 		t.Errorf("Want account ID %d, got %d", want, got)
 	}
 	if got, want := result.User, int64(2); want != got {
@@ -73,7 +62,7 @@ func TestMembershipList(t *testing.T) {
 	if got, want := len(result), 2; want != got {
 		t.Errorf("Want member count %d, got %d", want, got)
 	}
-	if got, want := result[0].Project, int64(1); want != got {
+	if got, want := result[0].{{title project}}, int64(1); want != got {
 		t.Errorf("Want account ID %d, got %d", want, got)
 	}
 	if got, want := result[0].User, int64(1); want != got {
@@ -97,7 +86,7 @@ func TestMembershipCreate(t *testing.T) {
 	}
 	store := NewMemberStoreSync(NewMemberStore(db))
 	create := &types.Membership{
-		Project: 2,
+		{{title project}}: 2,
 		User:    2,
 		Role:    enum.RoleAdmin,
 	}
@@ -142,7 +131,7 @@ func TestMembershipUpdate(t *testing.T) {
 
 	result.Role = enum.RoleDeveloper
 	err = store.Update(noContext, &types.Membership{
-		Project: result.Project,
+		{{title project}}: result.{{title project}},
 		User:    result.User,
 		Role:    enum.RoleDeveloper,
 	})
@@ -151,7 +140,7 @@ func TestMembershipUpdate(t *testing.T) {
 		return
 	}
 
-	updated, err := store.Find(noContext, result.Project, result.User)
+	updated, err := store.Find(noContext, result.{{title project}}, result.User)
 	if err != nil {
 		t.Error(err)
 		return

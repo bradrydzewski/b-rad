@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package database
 
@@ -19,8 +8,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/{{github}}/internal/store"
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/internal/store"
+	"github.com/{{toLower repo}}/types"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -137,6 +126,8 @@ const userBase = `
 SELECT
  user_id
 ,user_email
+,user_name
+,user_company
 ,user_password
 ,user_token
 ,user_admin
@@ -171,6 +162,8 @@ WHERE user_id = $1
 const userInsert = `
 INSERT INTO users (
  user_email
+,user_name
+,user_company
 ,user_password
 ,user_token
 ,user_admin
@@ -180,6 +173,8 @@ INSERT INTO users (
 ,user_authed
 ) values (
  :user_email
+,:user_name
+,:user_company
 ,:user_password
 ,:user_token
 ,:user_admin
@@ -198,6 +193,8 @@ const userUpdate = `
 UPDATE users
 SET
  user_email     = :user_email
+,user_name      = :user_name
+,user_company   = :user_company
 ,user_password  = :user_password
 ,user_token     = :user_token
 ,user_admin     = :user_admin

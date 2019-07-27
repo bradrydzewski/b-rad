@@ -26,16 +26,27 @@ tasks:
           --detach
           --rm
           postgres:9-alpine
-      - cmd: go test -v -cover github.com/{{github}}/internal/store/database
+      - cmd: go test -v -cover github.com/{{toLower repo}}/internal/store/database
       - cmd: docker kill postgres
         silent: true
 
+  cleanup:
+    cmds:
+    - rm -rf release
+    - rm -rf web/.cache
+    - rm -rf web/dist/files
+    - rm -rf web/node_modules
+    - rm -rf web/.env.development.local
+    - rm -rf {{toLower name}}
+    - rm -rf database.sqlite3
+    - rm -rf .env
+
   docker-build:
     cmds:
-    - docker build -t {{github}}:linux-amd64 -f docker/Dockerfile .
+    - docker build -t {{toLower repo}}:linux-amd64 -f docker/Dockerfile .
 
   docker-build-all:
     cmds:
-    - docker build -t {{github}}:linux-amd64 -f docker/Dockerfile .
-    - docker build -t {{github}}:linux-arm64 -f docker/Dockerfile.linux.arm64 .
-    - docker build -t {{github}}:linux-arm   -f docker/Dockerfile.linux.arm .
+    - docker build -t {{toLower repo}}:linux-amd64 -f docker/Dockerfile .
+    - docker build -t {{toLower repo}}:linux-arm64 -f docker/Dockerfile.linux.arm64 .
+    - docker build -t {{toLower repo}}:linux-arm   -f docker/Dockerfile.linux.arm .

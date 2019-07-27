@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package cli
 
@@ -19,15 +8,15 @@ import (
 	"context"
 	"os"
 
-	"github.com/{{github}}/cli/{{toLower child}}"
-	"github.com/{{github}}/cli/{{toLower parent}}"
-	"github.com/{{github}}/cli/member"
-	"github.com/{{github}}/cli/project"
-	"github.com/{{github}}/cli/server"
-	"github.com/{{github}}/cli/token"
-	"github.com/{{github}}/cli/user"
-	"github.com/{{github}}/cli/users"
-	"github.com/{{github}}/version"
+	"github.com/{{toLower repo}}/cli/{{toLower child}}"
+	"github.com/{{toLower repo}}/cli/{{toLower parent}}"
+	"github.com/{{toLower repo}}/cli/member"
+	"github.com/{{toLower repo}}/cli/{{toLower project}}"
+	"github.com/{{toLower repo}}/cli/server"
+	"github.com/{{toLower repo}}/cli/token"
+	"github.com/{{toLower repo}}/cli/user"
+	"github.com/{{toLower repo}}/cli/users"
+	"github.com/{{toLower repo}}/version"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -36,7 +25,7 @@ import (
 var nocontext = context.Background()
 
 // application name
-var application = "{{app}}"
+var application = "{{toLower name}}"
 
 // application description
 var description = "description goes here" // TODO edit this application description
@@ -47,7 +36,7 @@ func Command() {
 	app := kingpin.New(application, description)
 	server.Register(app)
 	user.Register(app)
-	project.Register(app)
+	{{toLower project}}.Register(app)
 	{{toLower parent}}.Register(app)
 	{{toLower child}}.Register(app)
 	member.Register(app)

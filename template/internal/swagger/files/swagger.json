@@ -16,64 +16,64 @@
   },
   "basePath": "/api/v1",
   "paths": {
-    "/projects": {
+    "/{{toLower project}}s": {
       "post": {
         "tags": [
-          "project"
+          "{{toLower project}}"
         ],
-        "summary": "Create a new project.",
-        "operationId": "createProject",
+        "summary": "Create a new {{toLower project}}.",
+        "operationId": "create{{title project}}",
         "parameters": [
           {
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/ProjectInput"
+              "$ref": "#/definitions/{{title project}}Input"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/project"
+            "$ref": "#/responses/{{toLower project}}"
           }
         }
       }
     },
-    "/projects/{project}": {
+    "/{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}": {
       "get": {
         "tags": [
-          "project"
+          "{{toLower project}}"
         ],
-        "summary": "Get the project with the matching project id.",
-        "operationId": "findProject",
+        "summary": "Get the {{toLower project}} with the matching {{toLower project}} id.",
+        "operationId": "find{{title project}}",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
             "x-go-name": "ID",
-            "name": "project",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/project"
+            "$ref": "#/responses/{{toLower project}}"
           }
         }
       },
       "delete": {
         "tags": [
-          "project"
+          "{{toLower project}}"
         ],
-        "summary": "Delete the project with the matching project id.",
-        "operationId": "deleteProject",
+        "summary": "Delete the {{toLower project}} with the matching {{toLower project}} id.",
+        "operationId": "delete{{title project}}",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
             "x-go-name": "ID",
-            "name": "project",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           }
@@ -86,16 +86,16 @@
       },
       "patch": {
         "tags": [
-          "project"
+          "{{toLower project}}"
         ],
-        "summary": "Update the project with the matching project id.",
-        "operationId": "updateProject",
+        "summary": "Update the {{toLower project}} with the matching {{toLower project}} id.",
+        "operationId": "update{{title project}}",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
             "x-go-name": "ID",
-            "name": "project",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           },
@@ -103,30 +103,30 @@
             "name": "Body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/ProjectInput"
+              "$ref": "#/definitions/{{title project}}Input"
             }
           }
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/project"
+            "$ref": "#/responses/{{toLower project}}"
           }
         }
       }
     },
-    "/projects/{project}/members": {
+    "/{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members": {
       "get": {
         "tags": [
           "member"
         ],
-        "summary": "Get the list of all project members.",
+        "summary": "Get the list of all {{toLower project}} members.",
         "operationId": "getMemberList",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Project",
-            "name": "project",
+            "x-go-name": "{{title project}}",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           }
@@ -141,14 +141,14 @@
         "tags": [
           "member"
         ],
-        "summary": "Create a new project member.",
+        "summary": "Create a new {{toLower project}} member.",
         "operationId": "createMember",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Project",
-            "name": "project",
+            "x-go-name": "{{title project}}",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           },
@@ -167,19 +167,19 @@
         }
       }
     },
-    "/projects/{project}/members/{user}": {
+    "/{{toLower project}}s/{{`{`}}{{toLower project}}{{`}`}}/members/{user}": {
       "get": {
         "tags": [
           "member"
         ],
-        "summary": "Get the project member with the matching email address.",
+        "summary": "Get the {{toLower project}} member with the matching email address.",
         "operationId": "getMember",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Project",
-            "name": "project",
+            "x-go-name": "{{title project}}",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           },
@@ -201,14 +201,14 @@
         "tags": [
           "member"
         ],
-        "summary": "Delete the project member.",
+        "summary": "Delete the {{toLower project}} member.",
         "operationId": "deleteMember",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Project",
-            "name": "project",
+            "x-go-name": "{{title project}}",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           },
@@ -230,14 +230,14 @@
         "tags": [
           "member"
         ],
-        "summary": "Update the project member.",
+        "summary": "Update the {{toLower project}} member.",
         "operationId": "updateMember",
         "parameters": [
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Project",
-            "name": "project",
+            "x-go-name": "{{title project}}",
+            "name": "{{toLower project}}",
             "in": "path",
             "required": true
           },
@@ -312,16 +312,16 @@
         }
       }
     },
-    "/users/projects": {
+    "/users/{{toLower project}}s": {
       "get": {
         "tags": [
           "user"
         ],
-        "summary": "Get the currently authenticated user's project list.",
-        "operationId": "getProjectList",
+        "summary": "Get the currently authenticated user's {{toLower project}} list.",
+        "operationId": "get{{title project}}List",
         "responses": {
           "200": {
-            "$ref": "#/responses/projectList"
+            "$ref": "#/responses/{{toLower project}}List"
           }
         }
       }
@@ -429,10 +429,10 @@
     "MembershipInput": {
       "type": "object",
       "properties": {
-        "project": {
+        "{{toLower project}}": {
           "type": "integer",
           "format": "int64",
-          "x-go-name": "Project"
+          "x-go-name": "{{title project}}"
         },
         "role": {
           "$ref": "#/definitions/Role"
@@ -443,7 +443,7 @@
         }
       }
     },
-    "Project": {
+    "{{title project}}": {
       "type": "object",
       "properties": {
         "active": {
@@ -475,7 +475,7 @@
         }
       }
     },
-    "ProjectInput": {
+    "{{title project}}Input": {
       "type": "object",
       "properties": {
         "desc": {
@@ -569,18 +569,18 @@
         }
       }
     },
-    "project": {
+    "{{toLower project}}": {
       "description": "",
       "schema": {
-        "$ref": "#/definitions/Project"
+        "$ref": "#/definitions/{{title project}}"
       }
     },
-    "projectList": {
+    "{{toLower project}}List": {
       "description": "",
       "schema": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/Project"
+          "$ref": "#/definitions/{{title project}}"
         }
       }
     },

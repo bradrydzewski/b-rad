@@ -3,13 +3,15 @@ import classnames from "classnames";
 
 export default (props) => {
 	const separator = props.separator || <Separator />;
-	const children = props.children.reduce((accumulator, item, index) => {
-		accumulator = index === 1 ? [] : accumulator;
-		console.log(accumulator);
-		accumulator.push(item);
-		accumulator.push(separator);
-		return accumulator;
-	});
+	const children =
+		(props.children &&
+			props.children.reduce &&
+			props.children.reduce((accumulator, item) => {
+				accumulator.push(item);
+				accumulator.push(separator);
+				return accumulator;
+			}, [])) ||
+		props.children;
 	return (
 		<div className={classnames(styles.root, props.className)}>{children}</div>
 	);

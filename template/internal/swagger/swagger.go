@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 // Package swagger defines the swagger specification.
 //
@@ -39,9 +28,15 @@ import (
 //go:embed files/*
 var content embed.FS
 
-// FileSystem provides access to the static web server
-// content, embedded in the binary.
-func FileSystem() http.FileSystem {
-	fsys, _ := fs.Sub(content, "files")
-	return http.FS(fsys)
+// Handler returns an http.Handler that servers the
+// swagger file from the embedded file system.
+func Handler() http.Handler {
+	// Load the files subdirectory
+	fs, err := fs.Sub(content, "files")
+	if err != nil {
+		panic(err)
+	}
+	// Create an http.FileServer to serve the
+	// contents of the files subdiretory.
+	return http.FileServer(http.FS(fs))
 }

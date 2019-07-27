@@ -13,16 +13,16 @@ var migrations = []struct {
 		stmt: createTableUsers,
 	},
 	{
-		name: "create-table-projects",
-		stmt: createTableProjects,
+		name: "create-table-{{toLower project}}s",
+		stmt: createTable{{title project}}s,
 	},
 	{
 		name: "create-table-members",
 		stmt: createTableMembers,
 	},
 	{
-		name: "create-index-members-project-id",
-		stmt: createIndexMembersProjectId,
+		name: "create-index-members-{{toLower project}}-id",
+		stmt: createIndexMembers{{title project}}Id,
 	},
 	{
 		name: "create-index-members-user-id",
@@ -30,19 +30,19 @@ var migrations = []struct {
 	},
 	{
 		name: "create-table-{{toLower parent}}s",
-		stmt: createTable{{parent}}s,
+		stmt: createTable{{title parent}}s,
 	},
 	{
-		name: "create-index-{{toLower parent}}-project-id",
-		stmt: createIndex{{parent}}ProjectId,
+		name: "create-index-{{toLower parent}}-{{toLower project}}-id",
+		stmt: createIndex{{title parent}}{{title project}}Id,
 	},
 	{
 		name: "create-table-{{toLower child}}s",
-		stmt: createTable{{child}}s,
+		stmt: createTable{{title child}}s,
 	},
 	{
 		name: "create-index-{{toLower child}}-{{toLower parent}}-id",
-		stmt: createIndex{{child}}{{parent}}Id,
+		stmt: createIndex{{title child}}{{title parent}}Id,
 	},
 }
 
@@ -129,6 +129,8 @@ CREATE TABLE IF NOT EXISTS users (
 ,user_email         TEXT COLLATE NOCASE
 ,user_password      TEXT
 ,user_token         TEXT
+,user_name          TEXT
+,user_company       TEXT
 ,user_admin         BOOLEAN
 ,user_blocked       BOOLEAN
 ,user_created       INTEGER
@@ -140,19 +142,19 @@ CREATE TABLE IF NOT EXISTS users (
 `
 
 //
-// 002_create_table_project.sql
+// 002_create_table_{{toLower project}}.sql
 //
 
-var createTableProjects = `
-CREATE TABLE IF NOT EXISTS projects (
- project_id          INTEGER PRIMARY KEY AUTOINCREMENT
-,project_name        TEXT
-,project_desc        TEXT
-,project_token       TEXT
-,project_active      BOOLEAN
-,project_created     INTEGER
-,project_updated     INTEGER
-,UNIQUE(project_token)
+var createTable{{title project}}s = `
+CREATE TABLE IF NOT EXISTS {{toLower project}}s (
+ {{toLower project}}_id          INTEGER PRIMARY KEY AUTOINCREMENT
+,{{toLower project}}_name        TEXT
+,{{toLower project}}_desc        TEXT
+,{{toLower project}}_token       TEXT
+,{{toLower project}}_active      BOOLEAN
+,{{toLower project}}_created     INTEGER
+,{{toLower project}}_updated     INTEGER
+,UNIQUE({{toLower project}}_token)
 );
 `
 
@@ -162,15 +164,15 @@ CREATE TABLE IF NOT EXISTS projects (
 
 var createTableMembers = `
 CREATE TABLE IF NOT EXISTS members (
- member_project_id INTEGER
+ member_{{toLower project}}_id INTEGER
 ,member_user_id    INTEGER
 ,member_role       INTEGER
-,PRIMARY KEY(member_project_id, member_user_id)
+,PRIMARY KEY(member_{{toLower project}}_id, member_user_id)
 );
 `
 
-var createIndexMembersProjectId = `
-CREATE INDEX IF NOT EXISTS index_members_project ON members(member_project_id)
+var createIndexMembers{{title project}}Id = `
+CREATE INDEX IF NOT EXISTS index_members_{{toLower project}} ON members(member_{{toLower project}}_id)
 `
 
 var createIndexMembersUserId = `
@@ -181,10 +183,10 @@ CREATE INDEX IF NOT EXISTS index_members_user ON members(member_user_id)
 // 005_create_table_{{toLower parent}}.sql
 //
 
-var createTable{{parent}}s = `
+var createTable{{title parent}}s = `
 CREATE TABLE IF NOT EXISTS {{toLower parent}}s (
  {{toLower parent}}_id          INTEGER PRIMARY KEY AUTOINCREMENT
-,{{toLower parent}}_project_id  INTEGER
+,{{toLower parent}}_{{toLower project}}_id  INTEGER
 ,{{toLower parent}}_name        TEXT
 ,{{toLower parent}}_desc        TEXT
 ,{{toLower parent}}_created     INTEGER
@@ -192,15 +194,15 @@ CREATE TABLE IF NOT EXISTS {{toLower parent}}s (
 );
 `
 
-var createIndex{{parent}}ProjectId = `
-CREATE INDEX IF NOT EXISTS index_{{toLower parent}}_project ON {{toLower parent}}s({{toLower parent}}_project_id);
+var createIndex{{title parent}}{{title project}}Id = `
+CREATE INDEX IF NOT EXISTS index_{{toLower parent}}_{{toLower project}} ON {{toLower parent}}s({{toLower parent}}_{{toLower project}}_id);
 `
 
 //
 // 007_create_table_{{toLower child}}.sql
 //
 
-var createTable{{child}}s = `
+var createTable{{title child}}s = `
 CREATE TABLE IF NOT EXISTS {{toLower child}}s (
  {{toLower child}}_id       INTEGER PRIMARY KEY AUTOINCREMENT
 ,{{toLower child}}_{{toLower parent}}_id   INTEGER
@@ -211,6 +213,6 @@ CREATE TABLE IF NOT EXISTS {{toLower child}}s (
 );
 `
 
-var createIndex{{child}}{{parent}}Id = `
+var createIndex{{title child}}{{title parent}}Id = `
 CREATE INDEX IF NOT EXISTS index_{{toLower child}}_{{toLower parent}} ON {{toLower child}}s({{toLower child}}_{{toLower parent}}_id);
 `

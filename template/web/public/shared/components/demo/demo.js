@@ -50,7 +50,7 @@ export default (props) => {
 					<Search />
 				</div>
 				<div>
-					<Search placeholder="Search Projects …" />
+					<Search placeholder="Search {{title project}}s …" />
 				</div>
 				<div>
 					<Search disabled />

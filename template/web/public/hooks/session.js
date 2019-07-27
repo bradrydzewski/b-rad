@@ -37,6 +37,13 @@ function useProvideSession() {
 		setSession(null);
 	};
 
+	// update updates the user account details stored
+	// in the current session.
+	const update = (session) => {
+		localStorage.setItem("session", JSON.stringify(session));
+		setSession(session);
+	};
+
 	const fetcher = async (endpoint, initConfig) => {
 		const credentials = "same-origin";
 		const headers = new Headers(
@@ -89,5 +96,6 @@ function useProvideSession() {
 		signin,
 		signout,
 		fetcher,
+		update,
 	};
 }

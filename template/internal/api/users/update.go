@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package users
 
@@ -19,26 +8,24 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/{{github}}/internal/api/render"
-	"github.com/{{github}}/internal/logger"
-	"github.com/{{github}}/internal/store"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/{{toLower repo}}/internal/api/render"
+	"github.com/{{toLower repo}}/internal/logger"
+	"github.com/{{toLower repo}}/internal/store"
+	"github.com/{{toLower repo}}/types"
 
 	"github.com/go-chi/chi"
-	"gopkg.in/guregu/null.v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
-type userUpdateInput struct {
-	Username null.String `json:"email"`
-	Password null.String `json:"password"`
-	Admin    null.Bool   `json:"admin"`
-}
+// GenerateFromPassword returns the bcrypt hash of the
+// password at the given cost.
+var hashPassword = bcrypt.GenerateFromPassword
 
 // HandleUpdate returns an http.HandlerFunc that processes an http.Request
 // to update a user account.
 func HandleUpdate(users store.UserStore) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		in := new(userUpdateInput)
+		in := new(types.UserInput)
 		err := json.NewDecoder(r.Body).Decode(in)
 		if err != nil {
 			render.BadRequest(w, err)
@@ -59,8 +46,24 @@ func HandleUpdate(users store.UserStore) http.HandlerFunc {
 			return
 		}
 
-		if in.Username.IsZero() == false {
-			user.Email = in.Username.String
+		if in.Password.IsZero() == false {
+			hash, err := hashPassword([]byte(in.Password.String), bcrypt.DefaultCost)
+			if err != nil {
+				render.InternalError(w, err)
+				logger.FromRequest(r).
+					WithError(err).
+					Debugln("cannot hash password")
+				return
+			}
+			user.Password = string(hash)
+		}
+
+		if in.Name.IsZero() == false {
+			user.Name = in.Name.String
+		}
+
+		if in.Company.IsZero() == false {
+			user.Company = in.Company.String
 		}
 
 		if in.Admin.Ptr() != nil {

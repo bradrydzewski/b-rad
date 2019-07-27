@@ -8,5 +8,5 @@ EXPOSE 443
 COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENV GODEBUG netdns=go
-ADD release/linux/amd64/{{app}} /bin/
-ENTRYPOINT ["/bin/{{app}}"]
+ADD release/linux/amd64/{{toLower name}} /bin/
+ENTRYPOINT ["/bin/{{toLower name}}"]

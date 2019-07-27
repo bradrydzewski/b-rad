@@ -1,4 +1,4 @@
-module github.com/{{github}}
+module github.com/{{toLower repo}}
 
 go 1.16
 

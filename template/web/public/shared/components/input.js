@@ -1,11 +1,14 @@
+// @ts-nocheck
+import { forwardRef } from "react";
 import styles from "./input.module.css";
 import classnames from "classnames";
 
-export default (props) => (
+export default forwardRef((props, ref) => (
 	<input
 		type={props.type || "text"}
-		ref={props.ref}
+		ref={ref}
 		value={props.value}
+		name={props.name}
 		className={classnames(styles.root, props.className)}
 		onClick={props.onClick}
 		onChange={props.onChange}
@@ -15,4 +18,4 @@ export default (props) => (
 		spellcheck={props.spellCheck}
 		placeholder={props.placeholder}
 	/>
-);
+));

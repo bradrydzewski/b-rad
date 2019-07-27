@@ -2,27 +2,27 @@ import { instance } from "./config.js";
 import useSWR, { mutate } from "swr";
 
 /**
- * create{{child}} creates a new {{toLower child}}.
+ * create{{title child}} creates a new {{toLower child}}.
  */
-export const create{{child}} = async (project, {{toLower parent}}, data, fetcher) => {
+export const create{{title child}} = async ({{toLower project}}, {{toLower parent}}, data, fetcher) => {
 	return fetcher(
-		`${instance}/api/v1/projects/${project}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`,
+		`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`,
 		{
 			body: JSON.stringify(data),
 			method: "POST",
 		}
 	).then(({{toLower child}}) => {
-		mutate(`${instance}/api/v1/projects/${project}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`);
+		mutate(`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`);
 		return {{toLower child}};
 	});
 };
 
 /**
- * update{{child}} updates an existing {{toLower child}}.
+ * update{{title child}} updates an existing {{toLower child}}.
  */
-export const update{{child}} = (project, {{toLower parent}}, {{toLower child}}, data, fetcher) => {
+export const update{{title child}} = ({{toLower project}}, {{toLower parent}}, {{toLower child}}, data, fetcher) => {
 	return fetcher(
-		`${instance}/api/v1/projects/${project}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s/${{`{`}}{{toLower child}}{{`}`}}`,
+		`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s/${{`{`}}{{toLower child}}{{`}`}}`,
 		{
 			body: JSON.stringify(data),
 			method: "PATCH",
@@ -31,23 +31,26 @@ export const update{{child}} = (project, {{toLower parent}}, {{toLower child}}, 
 };
 
 /**
- * delete{{child}} deletes an existing {{toLower child}}.
+ * delete{{title child}} deletes an existing {{toLower child}}.
  */
-export const delete{{child}} = (project, {{toLower parent}}, {{toLower child}}, fetcher) => {
+export const delete{{title child}} = ({{toLower project}}, {{toLower parent}}, {{toLower child}}, fetcher) => {
 	return fetcher(
-		`${instance}/api/v1/projects/${project}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s/${{`{`}}{{toLower child}}{{`}`}}`,
+		`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s/${{`{`}}{{toLower child}}{{`}`}}`,
 		{
 			method: "DELETE",
 		}
-	);
+	).then((_) => {
+		mutate(`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`);
+		return;
+	});
 };
 
 /**
  * use returns an swr hook that provides
  */
-export const use{{child}}List = (project, {{toLower parent}}) => {
+export const use{{title child}}List = ({{toLower project}}, {{toLower parent}}) => {
 	const { data, error } = useSWR(
-		`${instance}/api/v1/projects/${project}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`
+		`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s`
 	);
 
 	return {
@@ -60,9 +63,9 @@ export const use{{child}}List = (project, {{toLower parent}}) => {
 /**
  * use returns an swr hook that provides
  */
-export const use{{child}} = (project, {{toLower parent}}, {{toLower child}}) => {
+export const use{{title child}} = ({{toLower project}}, {{toLower parent}}, {{toLower child}}) => {
 	const { data, error } = useSWR(
-		`${instance}/api/v1/projects/${project}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s/${{`{`}}{{toLower child}}{{`}`}}`
+		`${instance}/api/v1/{{toLower project}}s/${{`{`}}{{toLower project}}{{`}`}}/{{toLower parent}}s/${{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s/${{`{`}}{{toLower child}}{{`}`}}`
 	);
 
 	return {

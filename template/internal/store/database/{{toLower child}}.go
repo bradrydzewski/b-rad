@@ -1,59 +1,48 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package database
 
 import (
 	"context"
 
-	"github.com/{{github}}/internal/store"
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/internal/store"
+	"github.com/{{toLower repo}}/types"
 
 	"github.com/jmoiron/sqlx"
 )
 
-var _ store.{{child}}Store = (*{{child}}Store)(nil)
+var _ store.{{title child}}Store = (*{{title child}}Store)(nil)
 
-// New{{child}}Store returns a new {{child}}Store.
-func New{{child}}Store(db *sqlx.DB) *{{child}}Store {
-	return &{{child}}Store{db}
+// New{{title child}}Store returns a new {{title child}}Store.
+func New{{title child}}Store(db *sqlx.DB) *{{title child}}Store {
+	return &{{title child}}Store{db}
 }
 
-// {{child}}Store implements a {{child}}Store backed by a relational
+// {{title child}}Store implements a {{title child}}Store backed by a relational
 // database.
-type {{child}}Store struct {
+type {{title child}}Store struct {
 	db *sqlx.DB
 }
 
 // Find finds the {{toLower child}} by id.
-func (s *{{child}}Store) Find(ctx context.Context, id int64) (*types.{{child}}, error) {
-	dst := new(types.{{child}})
+func (s *{{title child}}Store) Find(ctx context.Context, id int64) (*types.{{title child}}, error) {
+	dst := new(types.{{title child}})
 	err := s.db.Get(dst, {{toLower child}}SelectID, id)
 	return dst, err
 }
 
 // List returns a list of {{toLower child}}s.
-func (s *{{child}}Store) List(ctx context.Context, id int64, opts types.Params) ([]*types.{{child}}, error) {
-	dst := []*types.{{child}}{}
+func (s *{{title child}}Store) List(ctx context.Context, id int64, opts types.Params) ([]*types.{{title child}}, error) {
+	dst := []*types.{{title child}}{}
 	err := s.db.Select(&dst, {{toLower child}}Select, id)
 	// TODO(bradrydzewski) add limit and offset
 	return dst, err
 }
 
 // Create saves the {{toLower child}} details.
-func (s *{{child}}Store) Create(ctx context.Context, {{toLower child}} *types.{{child}}) error {
+func (s *{{title child}}Store) Create(ctx context.Context, {{toLower child}} *types.{{title child}}) error {
 	query := {{toLower child}}Insert
 
 	if s.db.DriverName() == "postgres" {
@@ -81,7 +70,7 @@ func (s *{{child}}Store) Create(ctx context.Context, {{toLower child}} *types.{{
 }
 
 // Update updates the {{toLower child}} details.
-func (s *{{child}}Store) Update(ctx context.Context, {{toLower child}} *types.{{child}}) error {
+func (s *{{title child}}Store) Update(ctx context.Context, {{toLower child}} *types.{{title child}}) error {
 	query, arg, err := s.db.BindNamed({{toLower child}}Update, {{toLower child}})
 	if err != nil {
 		return err
@@ -91,7 +80,7 @@ func (s *{{child}}Store) Update(ctx context.Context, {{toLower child}} *types.{{
 }
 
 // Delete deletes the {{toLower child}}.
-func (s *{{child}}Store) Delete(ctx context.Context, {{toLower child}} *types.{{child}}) error {
+func (s *{{title child}}Store) Delete(ctx context.Context, {{toLower child}} *types.{{title child}}) error {
 	_, err := s.db.Exec({{toLower child}}Delete, {{toLower child}}.ID)
 	return err
 }

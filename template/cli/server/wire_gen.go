@@ -6,11 +6,11 @@
 package server
 
 import (
-	"github.com/{{github}}/internal/router"
-	"github.com/{{github}}/internal/server"
-	"github.com/{{github}}/internal/store/database"
-	"github.com/{{github}}/internal/store/memory"
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/internal/router"
+	"github.com/{{toLower repo}}/internal/server"
+	"github.com/{{toLower repo}}/internal/store/database"
+	"github.com/{{toLower repo}}/internal/store/memory"
+	"github.com/{{toLower repo}}/types"
 )
 
 // Injectors from wire.go:
@@ -20,13 +20,13 @@ func initServer(config *types.Config) (*server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	{{toLower child}}Store := database.Provide{{child}}Store(db)
-	{{toLower parent}}Store := database.Provide{{parent}}Store(db)
+	{{toLower child}}Store := database.Provide{{title child}}Store(db)
+	{{toLower parent}}Store := database.Provide{{title parent}}Store(db)
 	memberStore := database.ProvideMemberStore(db)
-	projectStore := database.ProvideProjectStore(db)
+	{{toLower project}}Store := database.Provide{{title project}}Store(db)
 	userStore := database.ProvideUserStore(db)
 	systemStore := memory.New(config)
-	handler := router.New({{toLower child}}Store, {{toLower parent}}Store, memberStore, projectStore, userStore, systemStore)
+	handler := router.New({{toLower child}}Store, {{toLower parent}}Store, memberStore, {{toLower project}}Store, userStore, systemStore)
 	serverServer := server.ProvideServer(config, handler)
 	return serverServer, nil
 }

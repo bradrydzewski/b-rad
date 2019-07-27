@@ -1,17 +1,6 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package {{toLower parent}}
 
@@ -19,8 +8,8 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/{{github}}/cli/util"
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/cli/util"
+	"github.com/{{toLower repo}}/types"
 
 	"github.com/drone/funcmap"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -38,11 +27,11 @@ func (c *createCommand) run(*kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	in := &types.{{parent}}{
+	in := &types.{{title parent}}{
 		Name: c.name,
 		Desc: c.desc,
 	}
-	proj, err := client.{{parent}}Create(c.proj, in)
+	proj, err := client.{{title parent}}Create(c.proj, in)
 	if err != nil {
 		return err
 	}
@@ -60,7 +49,7 @@ func registerCreate(app *kingpin.CmdClause) {
 	cmd := app.Command("create", "create a {{toLower parent}}").
 		Action(c.run)
 
-	cmd.Arg("project_id", "project id").
+	cmd.Arg("{{toLower project}}_id", "{{toLower project}} id").
 		Required().
 		Int64Var(&c.proj)
 
@@ -72,7 +61,7 @@ func registerCreate(app *kingpin.CmdClause) {
 		StringVar(&c.desc)
 
 	cmd.Flag("format", "format the output using a Go template").
-		Default(projectTmpl).
+		Default({{toLower project}}Tmpl).
 		Hidden().
 		StringVar(&c.tmpl)
 }

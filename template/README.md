@@ -23,7 +23,7 @@ Build the server and command line tools:
 
 ```text
 $ go generate ./...
-$ go build -o release/{{app}}
+$ go build -o release/{{toLower name}}
 ```
 
 # Test
@@ -37,72 +37,72 @@ $ go test -v -cover ./...
 
 # Run
 
-This project supports all operating systems and architectures supported by Go.  This means you can build and run the system on your machine; docker containers are not required for local development and testing.
+This {{toLower project}} supports all operating systems and architectures supported by Go.  This means you can build and run the system on your machine; docker containers are not required for local development and testing.
 
 Start the server at `localhost:3000`
 
 ```text
-$ release/{{app}} server
+$ release/{{toLower name}} server
 ```
 
 # User Interface
 
-This project includes a simple user interface for interacting with the system. When you run the application, you can access the user interface by navigating to `http://localhost:3000` in your browser.
+This {{toLower project}} includes a simple user interface for interacting with the system. When you run the application, you can access the user interface by navigating to `http://localhost:3000` in your browser.
 
 # Command Line
 
-This project includes simple command line tools for interacting with the system. Please remember that you must start the server before you can execute commands.
+This {{toLower project}} includes simple command line tools for interacting with the system. Please remember that you must start the server before you can execute commands.
 
 Register a new user:
 
 ```text
-$ release/{{app}} register
+$ release/{{toLower name}} register
 ```
 
 Login to the application:
 
 ```text
-$ release/{{app}} login
+$ release/{{toLower name}} login
 ```
 
 Logout from the application:
 
 ```text
-$ release/{{app}} logout
+$ release/{{toLower name}} logout
 ```
 
 View your account details:
 
 ```text
-$ release/{{app}} account
+$ release/{{toLower name}} account
 ```
 
 Generate a peronsal access token:
 
 ```text
-$ release/{{app}} token
+$ release/{{toLower name}} token
 ```
 
-Create a project:
+Create a {{toLower project}}:
 
 ```text
-$ release/{{app}} project create <name>
+$ release/{{toLower name}} {{toLower project}} create <name>
 ```
 
-List projects:
+List {{toLower project}}s:
 
 ```text
-$ release/{{app}} project ls
+$ release/{{toLower name}} {{toLower project}} ls
 ```
 
 Debug and output http responses from the server:
 
 ```text
-$ DEBUG=true release/{{app}} project ls
+$ DEBUG=true release/{{toLower name}} {{toLower project}} ls
 ```
 
 View all commands:
 
 ```text
-$ release/{{app}} --help
+$ release/{{toLower name}} --help
 ```

@@ -15,14 +15,14 @@ steps:
   image: golang:1.16
   commands:
   - go test -v -cover ./...
-  - go build -ldflags '-extldflags "-static"' -o release/linux/amd64/{{app}}
+  - go build -ldflags '-extldflags "-static"' -o release/linux/amd64/{{toLower name}}
 
 - name: publish
   image: plugins/docker
   pull: if-not-exists
   settings:
     file: docker/Dockerfile
-    repo: {{github}}
+    repo: {{toLower repo}}
     auto_tag: true
     auto_tag_suffix: linux-amd64
     username:

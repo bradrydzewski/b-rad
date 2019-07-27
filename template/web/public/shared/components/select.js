@@ -1,3 +1,4 @@
+// @ts-nocheck
 import styles from "./select.module.css";
 import classnames from "classnames";
 
@@ -10,7 +11,7 @@ export default (props) => (
 		onMouseEnter={props.onMouseEnter}
 		onMouseLeave={props.onMouseLeave}
 		disabled={props.disabled}
-		width="350px"
+		width={props.width || "350px"}
 	>
 		{props.children}
 	</select>

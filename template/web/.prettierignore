@@ -1,0 +1,3 @@
+public/logo.svg
+
+public/pages/{{toLower project}}/{{toLower project}}.js

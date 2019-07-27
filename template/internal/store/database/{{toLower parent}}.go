@@ -1,59 +1,48 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package database
 
 import (
 	"context"
 
-	"github.com/{{github}}/internal/store"
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/internal/store"
+	"github.com/{{toLower repo}}/types"
 
 	"github.com/jmoiron/sqlx"
 )
 
-var _ store.{{parent}}Store = (*{{parent}}Store)(nil)
+var _ store.{{title parent}}Store = (*{{title parent}}Store)(nil)
 
-// New{{parent}}Store returns a new {{parent}}Store.
-func New{{parent}}Store(db *sqlx.DB) *{{parent}}Store {
-	return &{{parent}}Store{db}
+// New{{title parent}}Store returns a new {{title parent}}Store.
+func New{{title parent}}Store(db *sqlx.DB) *{{title parent}}Store {
+	return &{{title parent}}Store{db}
 }
 
-// {{parent}}Store implements a {{parent}}Store backed by a relational
+// {{title parent}}Store implements a {{title parent}}Store backed by a relational
 // database.
-type {{parent}}Store struct {
+type {{title parent}}Store struct {
 	db *sqlx.DB
 }
 
 // Find finds the {{toLower parent}} by id.
-func (s *{{parent}}Store) Find(ctx context.Context, id int64) (*types.{{parent}}, error) {
-	dst := new(types.{{parent}})
+func (s *{{title parent}}Store) Find(ctx context.Context, id int64) (*types.{{title parent}}, error) {
+	dst := new(types.{{title parent}})
 	err := s.db.Get(dst, {{toLower parent}}SelectID, id)
 	return dst, err
 }
 
 // List returns a list of {{toLower parent}}s.
-func (s *{{parent}}Store) List(ctx context.Context, id int64, opts types.Params) ([]*types.{{parent}}, error) {
-	dst := []*types.{{parent}}{}
+func (s *{{title parent}}Store) List(ctx context.Context, id int64, opts types.Params) ([]*types.{{title parent}}, error) {
+	dst := []*types.{{title parent}}{}
 	err := s.db.Select(&dst, {{toLower parent}}Select, id)
 	// TODO(bradrydzewski) add limit and offset
 	return dst, err
 }
 
 // Create saves the {{toLower parent}} details.
-func (s *{{parent}}Store) Create(ctx context.Context, {{toLower parent}} *types.{{parent}}) error {
+func (s *{{title parent}}Store) Create(ctx context.Context, {{toLower parent}} *types.{{title parent}}) error {
 	query := {{toLower parent}}Insert
 
 	if s.db.DriverName() == "postgres" {
@@ -81,7 +70,7 @@ func (s *{{parent}}Store) Create(ctx context.Context, {{toLower parent}} *types.
 }
 
 // Update updates the {{toLower parent}} details.
-func (s *{{parent}}Store) Update(ctx context.Context, {{toLower parent}} *types.{{parent}}) error {
+func (s *{{title parent}}Store) Update(ctx context.Context, {{toLower parent}} *types.{{title parent}}) error {
 	query, arg, err := s.db.BindNamed({{toLower parent}}Update, {{toLower parent}})
 	if err != nil {
 		return err
@@ -91,7 +80,7 @@ func (s *{{parent}}Store) Update(ctx context.Context, {{toLower parent}} *types.
 }
 
 // Delete deletes the {{toLower parent}}.
-func (s *{{parent}}Store) Delete(ctx context.Context, {{toLower parent}} *types.{{parent}}) error {
+func (s *{{title parent}}Store) Delete(ctx context.Context, {{toLower parent}} *types.{{title parent}}) error {
 	_, err := s.db.Exec({{toLower parent}}Delete, {{toLower parent}}.ID)
 	return err
 }
@@ -99,7 +88,7 @@ func (s *{{parent}}Store) Delete(ctx context.Context, {{toLower parent}} *types.
 const {{toLower parent}}Base = `
 SELECT
  {{toLower parent}}_id
-,{{toLower parent}}_project_id
+,{{toLower parent}}_{{toLower project}}_id
 ,{{toLower parent}}_name
 ,{{toLower parent}}_desc
 ,{{toLower parent}}_created
@@ -108,7 +97,7 @@ FROM {{toLower parent}}s
 `
 
 const {{toLower parent}}Select = {{toLower parent}}Base + `
-WHERE {{toLower parent}}_project_id = $1
+WHERE {{toLower parent}}_{{toLower project}}_id = $1
 ORDER BY {{toLower parent}}_name ASC
 `
 
@@ -123,13 +112,13 @@ WHERE {{toLower parent}}_id = $1
 
 const {{toLower parent}}Insert = `
 INSERT INTO {{toLower parent}}s (
- {{toLower parent}}_project_id
+ {{toLower parent}}_{{toLower project}}_id
 ,{{toLower parent}}_name
 ,{{toLower parent}}_desc
 ,{{toLower parent}}_created
 ,{{toLower parent}}_updated
 ) values (
- :{{toLower parent}}_project_id
+ :{{toLower parent}}_{{toLower project}}_id
 ,:{{toLower parent}}_name
 ,:{{toLower parent}}_desc
 ,:{{toLower parent}}_created

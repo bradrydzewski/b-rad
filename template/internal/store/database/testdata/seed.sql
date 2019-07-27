@@ -3,14 +3,14 @@
 --
 
 INSERT INTO users VALUES
-(1, 'jane@example.com', '', '12345', true, false, 1286668800, 1602374400, 1602460800),
-(2, 'john@example.com', '', '54321', false, true, 1286668800, 1602374400, 1602460800);
+(1, 'jane@example.com', '', '12345', 'Jane', 'Acme', true, false, 1286668800, 1602374400, 1602460800),
+(2, 'john@example.com', '', '54321', 'John', 'Acme', false, true, 1286668800, 1602374400, 1602460800);
 
 --
 -- PROJECTS
 --
 
-INSERT INTO projects VALUES (
+INSERT INTO {{toLower project}}s VALUES (
  1
 ,'sourcegraph'
 ,'Sourcegraph makes code search universal so developers can work on solving problems.'

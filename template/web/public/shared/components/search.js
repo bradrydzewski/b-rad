@@ -1,3 +1,4 @@
+// @ts-nocheck
 import styles from "./search.module.css";
 import classnames from "classnames";
 

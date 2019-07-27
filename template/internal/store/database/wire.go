@@ -1,23 +1,12 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package database
 
 import (
-	"github.com/{{github}}/internal/store"
-	"github.com/{{github}}/types"
+	"github.com/{{toLower repo}}/internal/store"
+	"github.com/{{toLower repo}}/types"
 
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
@@ -27,10 +16,10 @@ import (
 var WireSet = wire.NewSet(
 	ProvideDatabase,
 	ProvideUserStore,
-	ProvideProjectStore,
+	Provide{{title project}}Store,
 	ProvideMemberStore,
-	Provide{{parent}}Store,
-	Provide{{child}}Store,
+	Provide{{title parent}}Store,
+	Provide{{title child}}Store,
 )
 
 // ProvideDatabase provides a database connection.
@@ -53,14 +42,14 @@ func ProvideUserStore(db *sqlx.DB) store.UserStore {
 	}
 }
 
-// ProvideProjectStore provides a project store.
-func ProvideProjectStore(db *sqlx.DB) store.ProjectStore {
+// Provide{{title project}}Store provides a {{toLower project}} store.
+func Provide{{title project}}Store(db *sqlx.DB) store.{{title project}}Store {
 	switch db.DriverName() {
 	case "postgres":
-		return NewProjectStore(db)
+		return New{{title project}}Store(db)
 	default:
-		return NewProjectStoreSync(
-			NewProjectStore(db),
+		return New{{title project}}StoreSync(
+			New{{title project}}Store(db),
 		)
 	}
 }
@@ -77,26 +66,26 @@ func ProvideMemberStore(db *sqlx.DB) store.MemberStore {
 	}
 }
 
-// Provide{{parent}}Store provides a {{toLower parent}} store.
-func Provide{{parent}}Store(db *sqlx.DB) store.{{parent}}Store {
+// Provide{{title parent}}Store provides a {{toLower parent}} store.
+func Provide{{title parent}}Store(db *sqlx.DB) store.{{title parent}}Store {
 	switch db.DriverName() {
 	case "postgres":
-		return New{{parent}}Store(db)
+		return New{{title parent}}Store(db)
 	default:
-		return New{{parent}}StoreSync(
-			New{{parent}}Store(db),
+		return New{{title parent}}StoreSync(
+			New{{title parent}}Store(db),
 		)
 	}
 }
 
-// Provide{{child}}Store provides a {{toLower child}} store.
-func Provide{{child}}Store(db *sqlx.DB) store.{{child}}Store {
+// Provide{{title child}}Store provides a {{toLower child}} store.
+func Provide{{title child}}Store(db *sqlx.DB) store.{{title child}}Store {
 	switch db.DriverName() {
 	case "postgres":
-		return New{{child}}Store(db)
+		return New{{title child}}Store(db)
 	default:
-		return New{{child}}StoreSync(
-			New{{child}}Store(db),
+		return New{{title child}}StoreSync(
+			New{{title child}}Store(db),
 		)
 	}
 }

@@ -1,22 +1,11 @@
 // Copyright 2019 Brad Rydzewski. All rights reserved.
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Use of this source code is governed by the Polyform License
+// that can be found in the LICENSE.md file.
 
 package {{toLower child}}
 
 import (
-	"github.com/{{github}}/cli/util"
+	"github.com/{{toLower repo}}/cli/util"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -32,7 +21,7 @@ func (c *deleteCommand) run(*kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	return client.{{child}}Delete(c.proj, c.{{toLower parent}}, c.{{toLower child}})
+	return client.{{title child}}Delete(c.proj, c.{{toLower parent}}, c.{{toLower child}})
 }
 
 // helper function registers the user delete command
@@ -42,7 +31,7 @@ func registerDelete(app *kingpin.CmdClause) {
 	cmd := app.Command("delete", "delete a {{toLower parent}}").
 		Action(c.run)
 
-	cmd.Arg("project_id", "project id").
+	cmd.Arg("{{toLower project}}_id", "{{toLower project}} id").
 		Required().
 		Int64Var(&c.proj)
 
