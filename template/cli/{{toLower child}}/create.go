@@ -5,6 +5,7 @@
 package {{toLower child}}
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -16,11 +17,13 @@ import (
 )
 
 type createCommand struct {
-	proj int64
-	{{toLower parent}}  int64
-	name string
-	desc string
-	tmpl string
+	{{toLower project}} string
+	{{toLower parent}}   string
+	slug    string
+	name    string
+	desc    string
+	tmpl    string
+	json    bool
 }
 
 func (c *createCommand) run(*kingpin.ParseContext) error {
@@ -29,18 +32,24 @@ func (c *createCommand) run(*kingpin.ParseContext) error {
 		return err
 	}
 	in := &types.{{title child}}{
+		Slug: c.slug,
 		Name: c.name,
 		Desc: c.desc,
 	}
-	proj, err := client.{{title child}}Create(c.proj, c.{{toLower parent}}, in)
+	item, err := client.{{title child}}Create(c.{{toLower project}}, c.{{toLower parent}}, in)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, proj)
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user create command
@@ -50,13 +59,17 @@ func registerCreate(app *kingpin.CmdClause) {
 	cmd := app.Command("create", "create a {{toLower child}}").
 		Action(c.run)
 
-	cmd.Arg("{{toLower project}}_id", "{{toLower project}} id").
+	cmd.Arg("{{toLower project}} ", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.proj)
+		StringVar(&c.{{toLower project}})
 
-	cmd.Arg("{{toLower parent}}_id", "{{toLower parent}} id").
+	cmd.Arg("{{toLower parent}} ", "{{toLower parent}} slug").
 		Required().
-		Int64Var(&c.{{toLower parent}})
+		StringVar(&c.{{toLower parent}})
+
+	cmd.Arg("{{toLower child}}", "{{toLower child}} slug").
+		Required().
+		StringVar(&c.slug)
 
 	cmd.Arg("name", "{{toLower parent}} name").
 		Required().
@@ -65,8 +78,11 @@ func registerCreate(app *kingpin.CmdClause) {
 	cmd.Flag("desc", "{{toLower parent}} description").
 		StringVar(&c.desc)
 
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
+
 	cmd.Flag("format", "format the output using a Go template").
-		Default({{toLower project}}Tmpl).
+		Default({{toLower child}}Tmpl).
 		Hidden().
 		StringVar(&c.tmpl)
 }

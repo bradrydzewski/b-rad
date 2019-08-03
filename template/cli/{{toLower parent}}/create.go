@@ -5,6 +5,7 @@
 package {{toLower parent}}
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -16,10 +17,12 @@ import (
 )
 
 type createCommand struct {
-	proj int64
-	name string
-	desc string
-	tmpl string
+	{{toLower project}} string
+	slug    string
+	name    string
+	desc    string
+	tmpl    string
+	json    bool
 }
 
 func (c *createCommand) run(*kingpin.ParseContext) error {
@@ -28,18 +31,24 @@ func (c *createCommand) run(*kingpin.ParseContext) error {
 		return err
 	}
 	in := &types.{{title parent}}{
+		Slug: c.slug,
 		Name: c.name,
 		Desc: c.desc,
 	}
-	proj, err := client.{{title parent}}Create(c.proj, in)
+	item, err := client.{{title parent}}Create(c.{{toLower project}}, in)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, proj)
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user create command
@@ -49,19 +58,25 @@ func registerCreate(app *kingpin.CmdClause) {
 	cmd := app.Command("create", "create a {{toLower parent}}").
 		Action(c.run)
 
-	cmd.Arg("{{toLower project}}_id", "{{toLower project}} id").
+	cmd.Arg("{{toLower project}} ", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.proj)
+		StringVar(&c.{{toLower project}})
 
-	cmd.Arg("name", "{{toLower parent}} name").
+	cmd.Arg("slug ", "{{toLower parent}} slug").
 		Required().
+		StringVar(&c.slug)
+
+	cmd.Flag("name", "{{toLower parent}} name").
 		StringVar(&c.name)
 
 	cmd.Flag("desc", "{{toLower parent}} description").
 		StringVar(&c.desc)
 
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
+
 	cmd.Flag("format", "format the output using a Go template").
-		Default({{toLower project}}Tmpl).
+		Default({{toLower parent}}Tmpl).
 		Hidden().
 		StringVar(&c.tmpl)
 }

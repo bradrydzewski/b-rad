@@ -5,11 +5,12 @@
 package database
 
 import (
+	"bytes"
 	"context"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"os"
-	"strings"
+	"testing"
 
 	"github.com/jmoiron/sqlx"
 
@@ -34,24 +35,32 @@ func connect() (*sqlx.DB, error) {
 
 // seed seed the database state.
 func seed(db *sqlx.DB) error {
-	db.Exec("TRUNCATE TABLE {{toLower child}}s")
-	db.Exec("TRUNCATE TABLE {{toLower parent}}s")
-	db.Exec("TRUNCATE TABLE members")
-	db.Exec("TRUNCATE TABLE {{toLower project}}s")
-	db.Exec("TRUNCATE TABLE users")
+	db.Exec("DELETE FROM {{toLower child}}s")
+	db.Exec("DELETE FROM {{toLower parent}}s")
+	db.Exec("DELETE FROM members")
+	db.Exec("DELETE FROM {{toLower project}}s")
+	db.Exec("DELETE FROM users")
+	db.Exec("ALTER SEQUENCE users_user_id_seq RESTART WITH 1")
+	db.Exec("ALTER SEQUENCE {{toLower project}}s_{{toLower project}}_id_seq RESTART WITH 1")
+	db.Exec("ALTER SEQUENCE {{toLower parent}}s_{{toLower parent}}_id_seq RESTART WITH 1")
+	db.Exec("ALTER SEQUENCE {{toLower child}}s_{{toLower child}}_id_seq RESTART WITH 1")
+	return nil
+}
 
-	out, err := ioutil.ReadFile("testdata/seed.sql")
+// unmarshal a testdata file.
+func unmarshal(path string, v interface{}) error {
+	out, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
-	parts := strings.Split(string(out), ";")
-	for _, stmt := range parts {
-		if stmt == "" {
-			continue
-		}
-		if _, err := db.Exec(stmt); err != nil {
-			return fmt.Errorf("%s: %s", err, stmt)
-		}
-	}
-	return nil
+	return json.Unmarshal(out, v)
+}
+
+// dump json data to the test logs.
+func debug(t *testing.T, v interface{}) {
+	buf := new(bytes.Buffer)
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	enc.Encode(v)
+	t.Log(buf.String())
 }

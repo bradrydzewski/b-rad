@@ -5,6 +5,7 @@
 package users
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -17,6 +18,7 @@ import (
 type findCommand struct {
 	email string
 	tmpl  string
+	json  bool
 }
 
 func (c *findCommand) run(*kingpin.ParseContext) error {
@@ -27,6 +29,11 @@ func (c *findCommand) run(*kingpin.ParseContext) error {
 	user, err := client.User(c.email)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(user)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl + "\n")
 	if err != nil {
@@ -45,6 +52,9 @@ func registerFind(app *kingpin.CmdClause) {
 	cmd.Arg("id or email", "user id or email").
 		Required().
 		StringVar(&c.email)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default(userTmpl).

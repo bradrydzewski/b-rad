@@ -60,6 +60,11 @@ export default function Home() {
 	return (
 		<>
 			<section className={styles.root}>
+				<p>
+					Workspaces let you collaborate with team members, add permissions and
+					manage {{toLower parent}}s across your whole team under a single billing account.
+				</p>
+
 				<ul className={styles.list}>
 					{{`{`}}{{toLower project}}List.map(({{toLower project}}) => (
 						<{{title project}}Info {{toLower project}}={{`{`}}{{toLower project}}{{`}`}} onDelete={handleDelete} />
@@ -67,7 +72,7 @@ export default function Home() {
 				</ul>
 
 				<Button className={styles.button} onClick={() => setOpen(true)}>
-					New {{title project}}
+					New Workspace
 				</Button>
 
 				<Drawer open={open}>
@@ -82,7 +87,7 @@ export default function Home() {
 							<Input ref={descElem} type="text" placeholder="desc" />
 
 							<div className={styles.actions}>
-								<Button onClick={handleCreate}>Create {{title project}}</Button>
+								<Button onClick={handleCreate}>Create Workspace</Button>
 								<Button onClick={() => setOpen(false)}>Close</Button>
 							</div>
 						</div>
@@ -98,8 +103,8 @@ const {{title project}}Info = ({ {{toLower project}}, onDelete }) => {
 	return (
 		// <li >
 		<Link
-			href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}`}
-			id={{`{`}}{{toLower project}}.id}
+			href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}`}
+			id={{`{`}}{{toLower project}}.slug}
 			className={styles.item}
 		>
 			<Avatar text={{`{`}}{{toLower project}}.name} />

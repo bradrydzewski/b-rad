@@ -17,6 +17,9 @@ type (
 		// Find finds the {{toLower child}} by id.
 		Find(ctx context.Context, id int64) (*types.{{title child}}, error)
 
+		// FindSlug finds the {{toLower child}} by {{toLower parent}} id and slug.
+		FindSlug(ctx context.Context, id int64, slug string) (*types.{{title child}}, error)
+
 		// List returns a list of {{toLower child}}s by {{toLower parent}} id.
 		List(ctx context.Context, id int64, params types.Params) ([]*types.{{title child}}, error)
 
@@ -35,7 +38,10 @@ type (
 		// Find finds the {{toLower parent}} by id.
 		Find(ctx context.Context, id int64) (*types.{{title parent}}, error)
 
-		// List returns a list of {{toLower parent}}s by account id.
+		// FindSlug finds the {{toLower parent}} by {{toLower project}} id and slug.
+		FindSlug(ctx context.Context, id int64, slug string) (*types.{{title parent}}, error)
+
+		// List returns a list of {{toLower parent}}s by {{toLower project}} id.
 		List(ctx context.Context, id int64, params types.Params) ([]*types.{{title parent}}, error)
 
 		// Create saves the {{toLower parent}} details.
@@ -74,6 +80,9 @@ type (
 		// FindToken finds the {{toLower project}} by token.
 		FindToken(ctx context.Context, token string) (*types.{{title project}}, error)
 
+		// FindSlug finds the user unique name.
+		FindSlug(ctx context.Context, key string) (*types.{{title project}}, error)
+
 		// List returns a list of {{toLower project}}s by user.
 		List(ctx context.Context, user int64, params types.Params) ([]*types.{{title project}}, error)
 
@@ -99,7 +108,7 @@ type (
 		FindKey(ctx context.Context, key string) (*types.User, error)
 
 		// List returns a list of users.
-		List(ctx context.Context, params types.Params) ([]*types.User, error)
+		List(ctx context.Context, params types.UserFilter) ([]*types.User, error)
 
 		// Create saves the user details.
 		Create(ctx context.Context, user *types.User) error

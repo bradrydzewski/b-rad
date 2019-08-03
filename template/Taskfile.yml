@@ -30,7 +30,14 @@ tasks:
       - cmd: docker kill postgres
         silent: true
 
-  cleanup:
+  setup:
+    cmds:
+    - cd web; npm install
+    - cd web; npm run build
+    - go generate ./...
+    - go build
+
+  teardown:
     cmds:
     - rm -rf release
     - rm -rf web/.cache

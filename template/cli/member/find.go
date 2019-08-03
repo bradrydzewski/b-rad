@@ -5,6 +5,7 @@
 package member
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -15,9 +16,10 @@ import (
 )
 
 type findCommand struct {
-	proj int64
+	slug string
 	user string
 	tmpl string
+	json bool
 }
 
 func (c *findCommand) run(*kingpin.ParseContext) error {
@@ -25,15 +27,20 @@ func (c *findCommand) run(*kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	member, err := client.Member(c.proj, c.user)
+	item, err := client.Member(c.slug, c.user)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl + "\n")
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, member)
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user find command
@@ -43,13 +50,16 @@ func registerFind(app *kingpin.CmdClause) {
 	cmd := app.Command("find", "display {{toLower project}} details").
 		Action(c.run)
 
-	cmd.Arg("{{toLower project}}", "{{toLower project}} id").
+	cmd.Arg("{{toLower project}} ", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.proj)
+		StringVar(&c.slug)
 
 	cmd.Arg("user id or email", "member id or email").
 		Required().
 		StringVar(&c.user)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default(memberTmpl).

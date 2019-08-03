@@ -85,9 +85,9 @@ func main() {
 	params := Params{
 		Name:    app,
 		Repo:    repo,
-		Project: "Project",
-		Parent:  "Flock",
-		Child:   "Seagull",
+		Project: proj,
+		Parent:  parent,
+		Child:   child,
 	}
 
 	replacer1 := strings.NewReplacer(

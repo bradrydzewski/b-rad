@@ -5,6 +5,7 @@
 package users
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -19,6 +20,7 @@ type createCommand struct {
 	email string
 	admin bool
 	tmpl  string
+	json  bool
 }
 
 func (c *createCommand) run(*kingpin.ParseContext) error {
@@ -34,6 +36,11 @@ func (c *createCommand) run(*kingpin.ParseContext) error {
 	user, err := client.UserCreate(in)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(user)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
@@ -55,6 +62,9 @@ func registerCreate(app *kingpin.CmdClause) {
 
 	cmd.Arg("admin", "user is admin").
 		BoolVar(&c.admin)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default(userTmpl).

@@ -69,11 +69,11 @@ export default function {{title child}}({ params }) {
 		<>
 			<section className={styles.root}>
 				<Breadcrumb>
-					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s`}>{{title parent}}s</Link>
-					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s/${{`{`}}{{toLower parent}} && {{toLower parent}}.id}`}>
+					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s`}>{{title parent}}s</Link>
+					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s/${{`{`}}{{toLower parent}} && {{toLower parent}}.slug}`}>
 						{{`{`}}{{toLower parent}} && {{toLower parent}}.name}
 					</Link>
-					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s/${{`{`}}{{toLower parent}} && {{toLower parent}}.id}`}>
+					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s/${{`{`}}{{toLower parent}} && {{toLower parent}}.slug}`}>
 						{{title child}}s
 					</Link>
 				</Breadcrumb>

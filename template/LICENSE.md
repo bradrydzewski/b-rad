@@ -1,6 +1,6 @@
-# PolyForm Free Trial License 1.0.0
+# PolyForm Internal Use License 1.0.0
 
-<https://polyform{{toLower project}}.org/licenses/free-trial/1.0.0>
+<https://polyform{{toLower project}}.org/licenses/internal-use/1.0.0>
 
 ## Acceptance
 
@@ -16,7 +16,7 @@ otherwise infringe the licensor's copyright in it for any
 permitted purpose.  However, you may only make changes or
 new works based on the software according to [Changes and New
 Works License](#changes-and-new-works-license), and you may
-not distribute copies of the software.
+not distribute the software.
 
 ## Changes and New Works License
 
@@ -35,11 +35,10 @@ to license, that you would infringe by using the software.
 You may have "fair use" rights for the software under the
 law. These terms do not limit them.
 
-## Free Trial
+## Internal Business Use
 
-Use to evaluate whether the software suits a particular
-application for less than 32 consecutive calendar days, on
-behalf of you or your company, is use for a permitted purpose.
+Use of the software for the internal business operations of
+you and your company is use for a permitted purpose.
 
 ## No Other Rights
 
@@ -58,8 +57,12 @@ immediately for work on behalf of your company.
 
 ## Violations
 
-If you violate any of these terms, or do anything with the
-software not covered by your licenses, all your licenses
+The first time you are notified in writing that you have
+violated any of these terms, or done anything with the software
+not covered by your licenses, your licenses can nonetheless
+continue if you come into full compliance with these terms,
+and take practical steps to correct past violations, within
+32 days of receiving notice.  Otherwise, all your licenses
 end immediately.
 
 ## No Liability

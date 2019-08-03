@@ -5,18 +5,54 @@
 package migrate
 
 import (
-	"github.com/{{toLower repo}}/internal/store/database/migrate/postgres"
-	"github.com/{{toLower repo}}/internal/store/database/migrate/sqlite"
+	"context"
+	"database/sql"
+	"embed"
+	"io/fs"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/maragudk/migrate"
+	"github.com/rs/zerolog/log"
 )
+
+// background context
+var noContext = context.Background()
+
+//go:embed postgres/*.sql
+var postgres embed.FS
+
+//go:embed sqlite/*.sql
+var sqlite embed.FS
 
 // Migrate performs the database migration.
 func Migrate(db *sqlx.DB) error {
+	before := func(_ context.Context, _ *sql.Tx, version string) error {
+		log.Trace().Str("version", version).Msg("migration started")
+		return nil
+	}
+
+	after := func(_ context.Context, _ *sql.Tx, version string) error {
+		log.Trace().Str("version", version).Msg("migration complete")
+		return nil
+	}
+
+	opts := migrate.Options{
+		After:  after,
+		Before: before,
+		DB:     db.DB,
+		FS:     sqlite,
+		Table:  "migrations",
+	}
+
 	switch db.DriverName() {
 	case "postgres":
-		return postgres.Migrate(db.DB)
+		folder, _ := fs.Sub(postgres, "postgres")
+		opts.FS = folder
+
 	default:
-		return sqlite.Migrate(db.DB)
+		folder, _ := fs.Sub(sqlite, "sqlite")
+		opts.FS = folder
 	}
+
+	return migrate.New(opts).MigrateUp(noContext)
 }

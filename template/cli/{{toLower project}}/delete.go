@@ -11,7 +11,7 @@ import (
 )
 
 type deleteCommand struct {
-	id int64
+	slug string
 }
 
 func (c *deleteCommand) run(*kingpin.ParseContext) error {
@@ -19,7 +19,7 @@ func (c *deleteCommand) run(*kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	return client.{{title project}}Delete(c.id)
+	return client.{{title project}}Delete(c.slug)
 }
 
 // helper function registers the user delete command
@@ -29,7 +29,7 @@ func registerDelete(app *kingpin.CmdClause) {
 	cmd := app.Command("delete", "delete a {{toLower project}}").
 		Action(c.run)
 
-	cmd.Arg("id ", "{{toLower project}} id").
+	cmd.Arg("slug ", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.id)
+		StringVar(&c.slug)
 }

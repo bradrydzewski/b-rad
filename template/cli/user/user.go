@@ -5,6 +5,7 @@
 package user
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -21,6 +22,7 @@ admin: {{`{{`}} .Admin {{`}}`}}
 
 type command struct {
 	tmpl string
+	json bool
 }
 
 func (c *command) run(*kingpin.ParseContext) error {
@@ -31,6 +33,11 @@ func (c *command) run(*kingpin.ParseContext) error {
 	user, err := client.Self()
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(user)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
@@ -45,6 +52,9 @@ func Register(app *kingpin.Application) {
 
 	cmd := app.Command("account", "display authenticated user").
 		Action(c.run)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default(userTmpl).

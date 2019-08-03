@@ -5,6 +5,7 @@
 package member
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -17,10 +18,11 @@ import (
 )
 
 type createCommand struct {
-	proj int64
+	slug string
 	user string
 	role string
 	tmpl string
+	json bool
 }
 
 func (c *createCommand) run(*kingpin.ParseContext) error {
@@ -29,7 +31,7 @@ func (c *createCommand) run(*kingpin.ParseContext) error {
 		return err
 	}
 	in := new(types.MembershipInput)
-	in.{{title project}} = c.proj
+	in.{{title project}} = c.slug
 	in.User = c.user
 	switch c.role {
 	case "admin":
@@ -38,15 +40,20 @@ func (c *createCommand) run(*kingpin.ParseContext) error {
 		in.Role = enum.RoleDeveloper
 	}
 
-	member, err := client.MemberCreate(in)
+	item, err := client.MemberCreate(in)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, member)
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user create command
@@ -56,9 +63,9 @@ func registerCreate(app *kingpin.CmdClause) {
 	cmd := app.Command("create", "create a {{toLower project}}").
 		Action(c.run)
 
-	cmd.Arg("{{toLower project}}", "{{toLower project}} id").
+	cmd.Arg("{{toLower project}}", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.proj)
+		StringVar(&c.slug)
 
 	cmd.Arg("user id or email", "member id or email").
 		Required().
@@ -66,6 +73,9 @@ func registerCreate(app *kingpin.CmdClause) {
 
 	cmd.Flag("role", "update member role").
 		StringVar(&c.role)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default(memberTmpl).

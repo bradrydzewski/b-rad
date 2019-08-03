@@ -1,0 +1,20 @@
+[
+    {
+        "email": "jane@example.com",
+        "{{toLower project}}": 1,
+        "user": 1,
+        "role": "developer"
+    },
+    {
+        "email": "john@example.com",
+        "{{toLower project}}": 1,
+        "user": 2,
+        "role": "admin"
+    },
+    {
+        "email": "john@example.com",
+        "{{toLower project}}": 2,
+        "user": 2,
+        "role": "admin"
+    }
+]

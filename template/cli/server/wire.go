@@ -7,6 +7,7 @@
 package server
 
 import (
+	"github.com/{{toLower repo}}/internal/cron"
 	"github.com/{{toLower repo}}/internal/router"
 	"github.com/{{toLower repo}}/internal/server"
 	"github.com/{{toLower repo}}/internal/store/database"
@@ -16,12 +17,14 @@ import (
 	"github.com/google/wire"
 )
 
-func initServer(config *types.Config) (*server.Server, error) {
+func initSystem(config *types.Config) (*system, error) {
 	wire.Build(
 		database.WireSet,
 		memory.WireSet,
 		router.WireSet,
 		server.WireSet,
+		cron.WireSet,
+		newSystem,
 	)
-	return &server.Server{}, nil
+	return &system{}, nil
 }

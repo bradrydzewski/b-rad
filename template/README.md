@@ -3,7 +3,6 @@
 Install the latest stable version of Node and Go version 1.16 or higher, and then install the below Go programs. _Ensure the GOBIN directory is added to your PATH_.
 
 ```text
-$ go install github.com/bradrydzewski/togo
 $ go install github.com/golang/mock/mockgen
 $ go install github.com/google/wire/cmd/wire
 ```
@@ -13,10 +12,10 @@ $ go install github.com/google/wire/cmd/wire
 Build the user interface:
 
 ```text
-$ cd web
+$ pushd web
 $ npm install
 $ npm run build
-$ cd ..
+$ popd
 ```
 
 Build the server and command line tools:

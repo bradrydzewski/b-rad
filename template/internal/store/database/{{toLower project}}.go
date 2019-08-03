@@ -40,40 +40,27 @@ func (s *{{title project}}Store) FindToken(ctx context.Context, token string) (*
 	return dst, err
 }
 
+// FindSlug finds the {{toLower project}} by slug.
+func (s *{{title project}}Store) FindSlug(ctx context.Context, slug string) (*types.{{title project}}, error) {
+	dst := new(types.{{title project}})
+	err := s.db.Get(dst, {{toLower project}}SelectSlug, slug)
+	return dst, err
+}
+
 // List returns a list of {{toLower project}}s by user.
 func (s *{{title project}}Store) List(ctx context.Context, user int64, opts types.Params) ([]*types.{{title project}}, error) {
 	dst := []*types.{{title project}}{}
-	err := s.db.Select(&dst, {{toLower project}}Select, user)
-	// TODO(bradrydzewski) add limit and offset
+	err := s.db.Select(&dst, {{toLower project}}Select, user, limit(opts.Size), offset(opts.Page, opts.Size))
 	return dst, err
 }
 
 // Create saves the {{toLower project}} details.
 func (s *{{title project}}Store) Create(ctx context.Context, {{toLower project}} *types.{{title project}}) error {
-	query := {{toLower project}}Insert
-
-	if s.db.DriverName() == "postgres" {
-		query = {{toLower project}}InsertPg
-	}
-
-	query, arg, err := s.db.BindNamed(query, {{toLower project}})
+	query, arg, err := s.db.BindNamed({{toLower project}}Insert, {{toLower project}})
 	if err != nil {
 		return err
 	}
-
-	if s.db.DriverName() == "postgres" {
-		return s.db.QueryRow(query, arg...).Scan(&{{toLower project}}.ID)
-	}
-
-	res, err := s.db.Exec(query, arg...)
-	if err != nil {
-		return err
-	}
-	{{toLower project}}.ID, err = res.LastInsertId()
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.db.QueryRow(query, arg...).Scan(&{{toLower project}}.ID)
 }
 
 // Update updates the {{toLower project}} details.
@@ -88,14 +75,41 @@ func (s *{{title project}}Store) Update(ctx context.Context, {{toLower project}}
 
 // Delete deletes the {{toLower project}}.
 func (s *{{title project}}Store) Delete(ctx context.Context, {{toLower project}} *types.{{title project}}) error {
-	_, err := s.db.Exec({{toLower project}}Delete, {{toLower project}}.ID)
-	return err
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// pleae note that we are aware of foreign keys and
+	// cascading deletes, however, we chose to implement
+	// this logic in the application code in the event we
+	// want to leverage citus postgres.
+	//
+	// to future developers: feel free to remove and
+	// replace with foreign keys and cascading deletes
+	// at your discretion.
+
+	// delete the {{toLower child}}s associated with the {{toLower project}}
+	if _, err := tx.Exec({{toLower child}}Delete{{title project}}, {{toLower project}}.ID); err != nil {
+		return err
+	}
+	// delete the {{toLower parent}}s associated with the {{toLower project}}
+	if _, err := tx.Exec({{toLower parent}}Delete{{title project}}, {{toLower project}}.ID); err != nil {
+		return err
+	}
+	// delete the {{toLower project}}
+	if _, err := tx.Exec({{toLower project}}Delete, {{toLower project}}.ID); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 const {{toLower project}}Base = `
 SELECT
  {{toLower project}}_id
 ,{{toLower project}}_name
+,{{toLower project}}_slug
 ,{{toLower project}}_desc
 ,{{toLower project}}_token
 ,{{toLower project}}_active
@@ -110,7 +124,8 @@ WHERE {{toLower project}}_id IN (
   FROM members
   WHERE member_user_id = $1
 )
-ORDER BY {{toLower project}}_name
+ORDER BY {{toLower project}}_slug
+LIMIT $2 OFFSET $3
 `
 
 const {{toLower project}}SelectID = {{toLower project}}Base + `
@@ -121,6 +136,10 @@ const {{toLower project}}SelectToken = {{toLower project}}Base + `
 WHERE {{toLower project}}_token = $1
 `
 
+const {{toLower project}}SelectSlug = {{toLower project}}Base + `
+WHERE {{toLower project}}_slug = $1
+`
+
 const {{toLower project}}Delete = `
 DELETE FROM {{toLower project}}s
 WHERE {{toLower project}}_id = $1
@@ -129,6 +148,7 @@ WHERE {{toLower project}}_id = $1
 const {{toLower project}}Insert = `
 INSERT INTO {{toLower project}}s (
  {{toLower project}}_name
+,{{toLower project}}_slug
 ,{{toLower project}}_desc
 ,{{toLower project}}_token
 ,{{toLower project}}_active
@@ -136,16 +156,13 @@ INSERT INTO {{toLower project}}s (
 ,{{toLower project}}_updated
 ) values (
  :{{toLower project}}_name
+,:{{toLower project}}_slug
 ,:{{toLower project}}_desc
 ,:{{toLower project}}_token
 ,:{{toLower project}}_active
 ,:{{toLower project}}_created
 ,:{{toLower project}}_updated
-)
-`
-
-const {{toLower project}}InsertPg = {{toLower project}}Insert + `
-RETURNING {{toLower project}}_id
+) RETURNING {{toLower project}}_id
 `
 
 const {{toLower project}}Update = `

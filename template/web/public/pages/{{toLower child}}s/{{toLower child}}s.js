@@ -83,7 +83,7 @@ export default function {{title child}}List({ params }) {
 	const handleCreate = () => {
 		const name = nameElem.current.value;
 		const desc = descElem.current.value;
-		create{{title child}}({{toLower project}}.id, {{toLower parent}}.id, { name, desc }, fetcher).then(
+		create{{title child}}({{toLower project}}.slug, {{toLower parent}}.slug, { name, desc }, fetcher).then(
 			({{toLower child}}) => {
 				nameElem.current.value = "";
 				descElem.current.value = "";
@@ -97,7 +97,7 @@ export default function {{title child}}List({ params }) {
 	//
 
 	const handleDelete = ({{toLower project}}, {{toLower parent}}, {{toLower child}}) => {
-		delete{{title child}}({{toLower project}}.id, {{toLower parent}}.id, {{toLower child}}.id, fetcher);
+		delete{{title child}}({{toLower project}}.slug, {{toLower parent}}.slug, {{toLower child}}.slug, fetcher);
 	};
 
 	//
@@ -108,8 +108,8 @@ export default function {{title child}}List({ params }) {
 		<>
 			<section className={styles.root}>
 				<Breadcrumb>
-					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s`}>{{title parent}}s</Link>
-					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s/${{`{`}}{{toLower parent}} && {{toLower parent}}.id}`}>
+					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s`}>{{title parent}}s</Link>
+					<Link href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s/${{`{`}}{{toLower parent}} && {{toLower parent}}.slug}`}>
 						{{`{`}}{{toLower parent}} && {{toLower parent}}.name}
 					</Link>
 				</Breadcrumb>
@@ -156,10 +156,10 @@ export default function {{title child}}List({ params }) {
 // render the {{toLower child}} information.
 const {{title child}}Info = ({ {{toLower parent}}, {{toLower child}}, {{toLower project}}, onDelete }) => {
 	return (
-		<li id={{`{`}}{{toLower child}}.id} className={styles.item}>
+		<li id={{`{`}}{{toLower child}}.slug} className={styles.item}>
 			<Avatar text={{`{`}}{{toLower child}}.name} className={styles.avatar} />
 			<Link
-				href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s/${{`{`}}{{toLower parent}}.id}/{{toLower child}}s/${{`{`}}{{toLower child}}.id}`}
+				href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s/${{`{`}}{{toLower parent}}.slug}/{{toLower child}}s/${{`{`}}{{toLower child}}.slug}`}
 				className={styles.fill}
 			>
 				{{`{`}}{{toLower child}}.name}

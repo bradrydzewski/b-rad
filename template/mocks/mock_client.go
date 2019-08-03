@@ -33,82 +33,8 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
-// {{title child}} mocks base method
-func (m *MockClient) {{title child}}(arg0, arg1, arg2 int64) (*types.{{title child}}, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title child}}", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*types.{{title child}})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// {{title child}} indicates an expected call of {{title child}}
-func (mr *MockClientMockRecorder) {{title child}}(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}", reflect.TypeOf((*MockClient)(nil).{{title child}}), arg0, arg1, arg2)
-}
-
-// {{title child}}Create mocks base method
-func (m *MockClient) {{title child}}Create(arg0, arg1 int64, arg2 *types.{{title child}}) (*types.{{title child}}, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title child}}Create", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*types.{{title child}})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// {{title child}}Create indicates an expected call of {{title child}}Create
-func (mr *MockClientMockRecorder) {{title child}}Create(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}Create", reflect.TypeOf((*MockClient)(nil).{{title child}}Create), arg0, arg1, arg2)
-}
-
-// {{title child}}Delete mocks base method
-func (m *MockClient) {{title child}}Delete(arg0, arg1, arg2 int64) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title child}}Delete", arg0, arg1, arg2)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// {{title child}}Delete indicates an expected call of {{title child}}Delete
-func (mr *MockClientMockRecorder) {{title child}}Delete(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}Delete", reflect.TypeOf((*MockClient)(nil).{{title child}}Delete), arg0, arg1, arg2)
-}
-
-// {{title child}}List mocks base method
-func (m *MockClient) {{title child}}List(arg0, arg1 int64) ([]*types.{{title child}}, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title child}}List", arg0, arg1)
-	ret0, _ := ret[0].([]*types.{{title child}})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// {{title child}}List indicates an expected call of {{title child}}List
-func (mr *MockClientMockRecorder) {{title child}}List(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}List", reflect.TypeOf((*MockClient)(nil).{{title child}}List), arg0, arg1)
-}
-
-// {{title child}}Update mocks base method
-func (m *MockClient) {{title child}}Update(arg0, arg1, arg2 int64, arg3 *types.{{title child}}Input) (*types.{{title child}}, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title child}}Update", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(*types.{{title child}})
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// {{title child}}Update indicates an expected call of {{title child}}Update
-func (mr *MockClientMockRecorder) {{title child}}Update(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}Update", reflect.TypeOf((*MockClient)(nil).{{title child}}Update), arg0, arg1, arg2, arg3)
-}
-
 // {{title parent}} mocks base method
-func (m *MockClient) {{title parent}}(arg0, arg1 int64) (*types.{{title parent}}, error) {
+func (m *MockClient) {{title parent}}(arg0, arg1 string) (*types.{{title parent}}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title parent}}", arg0, arg1)
 	ret0, _ := ret[0].(*types.{{title parent}})
@@ -123,7 +49,7 @@ func (mr *MockClientMockRecorder) {{title parent}}(arg0, arg1 interface{}) *gomo
 }
 
 // {{title parent}}Create mocks base method
-func (m *MockClient) {{title parent}}Create(arg0 int64, arg1 *types.{{title parent}}) (*types.{{title parent}}, error) {
+func (m *MockClient) {{title parent}}Create(arg0 string, arg1 *types.{{title parent}}) (*types.{{title parent}}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title parent}}Create", arg0, arg1)
 	ret0, _ := ret[0].(*types.{{title parent}})
@@ -138,7 +64,7 @@ func (mr *MockClientMockRecorder) {{title parent}}Create(arg0, arg1 interface{})
 }
 
 // {{title parent}}Delete mocks base method
-func (m *MockClient) {{title parent}}Delete(arg0, arg1 int64) error {
+func (m *MockClient) {{title parent}}Delete(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title parent}}Delete", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -152,22 +78,22 @@ func (mr *MockClientMockRecorder) {{title parent}}Delete(arg0, arg1 interface{})
 }
 
 // {{title parent}}List mocks base method
-func (m *MockClient) {{title parent}}List(arg0 int64) ([]*types.{{title parent}}, error) {
+func (m *MockClient) {{title parent}}List(arg0 string, arg1 types.Params) ([]*types.{{title parent}}, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title parent}}List", arg0)
+	ret := m.ctrl.Call(m, "{{title parent}}List", arg0, arg1)
 	ret0, _ := ret[0].([]*types.{{title parent}})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // {{title parent}}List indicates an expected call of {{title parent}}List
-func (mr *MockClientMockRecorder) {{title parent}}List(arg0 interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) {{title parent}}List(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title parent}}List", reflect.TypeOf((*MockClient)(nil).{{title parent}}List), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title parent}}List", reflect.TypeOf((*MockClient)(nil).{{title parent}}List), arg0, arg1)
 }
 
 // {{title parent}}Update mocks base method
-func (m *MockClient) {{title parent}}Update(arg0, arg1 int64, arg2 *types.{{title parent}}Input) (*types.{{title parent}}, error) {
+func (m *MockClient) {{title parent}}Update(arg0, arg1 string, arg2 *types.{{title parent}}Input) (*types.{{title parent}}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title parent}}Update", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*types.{{title parent}})
@@ -197,7 +123,7 @@ func (mr *MockClientMockRecorder) Login(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Member mocks base method
-func (m *MockClient) Member(arg0 int64, arg1 string) (*types.Member, error) {
+func (m *MockClient) Member(arg0, arg1 string) (*types.Member, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Member", arg0, arg1)
 	ret0, _ := ret[0].(*types.Member)
@@ -227,7 +153,7 @@ func (mr *MockClientMockRecorder) MemberCreate(arg0 interface{}) *gomock.Call {
 }
 
 // MemberDelete mocks base method
-func (m *MockClient) MemberDelete(arg0 int64, arg1 string) error {
+func (m *MockClient) MemberDelete(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MemberDelete", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -241,18 +167,18 @@ func (mr *MockClientMockRecorder) MemberDelete(arg0, arg1 interface{}) *gomock.C
 }
 
 // MemberList mocks base method
-func (m *MockClient) MemberList(arg0 int64) ([]*types.Member, error) {
+func (m *MockClient) MemberList(arg0 string, arg1 types.Params) ([]*types.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MemberList", arg0)
+	ret := m.ctrl.Call(m, "MemberList", arg0, arg1)
 	ret0, _ := ret[0].([]*types.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // MemberList indicates an expected call of MemberList
-func (mr *MockClientMockRecorder) MemberList(arg0 interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) MemberList(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MemberList", reflect.TypeOf((*MockClient)(nil).MemberList), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MemberList", reflect.TypeOf((*MockClient)(nil).MemberList), arg0, arg1)
 }
 
 // MemberUpdate mocks base method
@@ -271,7 +197,7 @@ func (mr *MockClientMockRecorder) MemberUpdate(arg0 interface{}) *gomock.Call {
 }
 
 // {{title project}} mocks base method
-func (m *MockClient) {{title project}}(arg0 int64) (*types.{{title project}}, error) {
+func (m *MockClient) {{title project}}(arg0 string) (*types.{{title project}}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title project}}", arg0)
 	ret0, _ := ret[0].(*types.{{title project}})
@@ -301,7 +227,7 @@ func (mr *MockClientMockRecorder) {{title project}}Create(arg0 interface{}) *gom
 }
 
 // {{title project}}Delete mocks base method
-func (m *MockClient) {{title project}}Delete(arg0 int64) error {
+func (m *MockClient) {{title project}}Delete(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title project}}Delete", arg0)
 	ret0, _ := ret[0].(error)
@@ -315,22 +241,22 @@ func (mr *MockClientMockRecorder) {{title project}}Delete(arg0 interface{}) *gom
 }
 
 // {{title project}}List mocks base method
-func (m *MockClient) {{title project}}List() ([]*types.{{title project}}, error) {
+func (m *MockClient) {{title project}}List(arg0 types.Params) ([]*types.{{title project}}, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "{{title project}}List")
+	ret := m.ctrl.Call(m, "{{title project}}List", arg0)
 	ret0, _ := ret[0].([]*types.{{title project}})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // {{title project}}List indicates an expected call of {{title project}}List
-func (mr *MockClientMockRecorder) {{title project}}List() *gomock.Call {
+func (mr *MockClientMockRecorder) {{title project}}List(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title project}}List", reflect.TypeOf((*MockClient)(nil).{{title project}}List))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title project}}List", reflect.TypeOf((*MockClient)(nil).{{title project}}List), arg0)
 }
 
 // {{title project}}Update mocks base method
-func (m *MockClient) {{title project}}Update(arg0 int64, arg1 *types.{{title project}}Input) (*types.{{title project}}, error) {
+func (m *MockClient) {{title project}}Update(arg0 string, arg1 *types.{{title project}}Input) (*types.{{title project}}, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "{{title project}}Update", arg0, arg1)
 	ret0, _ := ret[0].(*types.{{title project}})
@@ -357,6 +283,80 @@ func (m *MockClient) Register(arg0, arg1 string) (*types.Token, error) {
 func (mr *MockClientMockRecorder) Register(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockClient)(nil).Register), arg0, arg1)
+}
+
+// {{title child}} mocks base method
+func (m *MockClient) {{title child}}(arg0, arg1, arg2 string) (*types.{{title child}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "{{title child}}", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*types.{{title child}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// {{title child}} indicates an expected call of {{title child}}
+func (mr *MockClientMockRecorder) {{title child}}(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}", reflect.TypeOf((*MockClient)(nil).{{title child}}), arg0, arg1, arg2)
+}
+
+// {{title child}}Create mocks base method
+func (m *MockClient) {{title child}}Create(arg0, arg1 string, arg2 *types.{{title child}}) (*types.{{title child}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "{{title child}}Create", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*types.{{title child}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// {{title child}}Create indicates an expected call of {{title child}}Create
+func (mr *MockClientMockRecorder) {{title child}}Create(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}Create", reflect.TypeOf((*MockClient)(nil).{{title child}}Create), arg0, arg1, arg2)
+}
+
+// {{title child}}Delete mocks base method
+func (m *MockClient) {{title child}}Delete(arg0, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "{{title child}}Delete", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// {{title child}}Delete indicates an expected call of {{title child}}Delete
+func (mr *MockClientMockRecorder) {{title child}}Delete(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}Delete", reflect.TypeOf((*MockClient)(nil).{{title child}}Delete), arg0, arg1, arg2)
+}
+
+// {{title child}}List mocks base method
+func (m *MockClient) {{title child}}List(arg0, arg1 string, arg2 types.Params) ([]*types.{{title child}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "{{title child}}List", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]*types.{{title child}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// {{title child}}List indicates an expected call of {{title child}}List
+func (mr *MockClientMockRecorder) {{title child}}List(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}List", reflect.TypeOf((*MockClient)(nil).{{title child}}List), arg0, arg1, arg2)
+}
+
+// {{title child}}Update mocks base method
+func (m *MockClient) {{title child}}Update(arg0, arg1, arg2 string, arg3 *types.{{title child}}Input) (*types.{{title child}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "{{title child}}Update", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(*types.{{title child}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// {{title child}}Update indicates an expected call of {{title child}}Update
+func (mr *MockClientMockRecorder) {{title child}}Update(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "{{title child}}Update", reflect.TypeOf((*MockClient)(nil).{{title child}}Update), arg0, arg1, arg2, arg3)
 }
 
 // Self mocks base method
@@ -434,18 +434,18 @@ func (mr *MockClientMockRecorder) UserDelete(arg0 interface{}) *gomock.Call {
 }
 
 // UserList mocks base method
-func (m *MockClient) UserList() ([]*types.User, error) {
+func (m *MockClient) UserList(arg0 types.Params) ([]*types.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserList")
+	ret := m.ctrl.Call(m, "UserList", arg0)
 	ret0, _ := ret[0].([]*types.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // UserList indicates an expected call of UserList
-func (mr *MockClientMockRecorder) UserList() *gomock.Call {
+func (mr *MockClientMockRecorder) UserList(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserList", reflect.TypeOf((*MockClient)(nil).UserList))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserList", reflect.TypeOf((*MockClient)(nil).UserList), arg0)
 }
 
 // UserUpdate mocks base method

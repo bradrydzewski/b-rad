@@ -41,7 +41,7 @@ export default function {{title parent}}List({ params }) {
 		{{toLower parent}}List,
 		isLoading: is{{title parent}}Loading,
 		isError: is{{title parent}}Errror,
-	} = use{{title parent}}List({{toLower project}} && {{toLower project}}.id);
+	} = use{{title parent}}List({{toLower project}} && {{toLower project}}.slug);
 
 	if (is{{title parent}}Loading) {
 		return renderLoading();
@@ -62,7 +62,7 @@ export default function {{title parent}}List({ params }) {
 		const name = nameElem.current.value;
 		const desc = descElem.current.value;
 		const data = { name, desc };
-		const params = { {{toLower project}}: {{toLower project}}.id };
+		const params = { {{toLower project}}: {{toLower project}}.slug };
 		create{{title parent}}(params, data, fetcher).then(({{toLower project}}) => {
 			nameElem.current.value = "";
 			descElem.current.value = "";
@@ -75,7 +75,7 @@ export default function {{title parent}}List({ params }) {
 	//
 
 	const handleDelete = ({{toLower parent}}) => {
-		const params = { {{toLower project}}: {{toLower project}}.id, {{toLower parent}}: {{toLower parent}}.id };
+		const params = { {{toLower project}}: {{toLower project}}.slug, {{toLower parent}}: {{toLower parent}}.slug };
 		delete{{title parent}}(params, fetcher);
 	};
 
@@ -126,10 +126,10 @@ export default function {{title parent}}List({ params }) {
 // render the {{toLower parent}} information.
 const {{title parent}}Info = ({ {{toLower parent}}, {{toLower project}}, onDelete }) => {
 	return (
-		<li id={{`{`}}{{toLower parent}}.id} className={styles.item}>
+		<li id={{`{`}}{{toLower parent}}.slug} className={styles.item}>
 			<Avatar text={{`{`}}{{toLower parent}}.name} className={styles.avatar} />
 			<Link
-				href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}/{{toLower parent}}s/${{`{`}}{{toLower parent}}.id}`}
+				href={`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}/{{toLower parent}}s/${{`{`}}{{toLower parent}}.slug}`}
 				className={styles.fill}
 			>
 				{{`{`}}{{toLower parent}}.name}

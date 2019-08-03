@@ -5,6 +5,7 @@
 package {{toLower child}}
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -15,10 +16,11 @@ import (
 )
 
 type findCommand struct {
-	proj int64
-	{{toLower parent}}  int64
-	{{toLower child}}  int64
-	tmpl string
+	{{toLower project}} string
+	{{toLower parent}}   string
+	slug    string
+	tmpl    string
+	json    bool
 }
 
 func (c *findCommand) run(*kingpin.ParseContext) error {
@@ -26,15 +28,20 @@ func (c *findCommand) run(*kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	proj, err := client.{{title child}}(c.proj, c.{{toLower parent}}, c.{{toLower child}})
+	item, err := client.{{title child}}(c.{{toLower project}}, c.{{toLower parent}}, c.slug)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl + "\n")
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, proj)
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user find command
@@ -44,20 +51,23 @@ func registerFind(app *kingpin.CmdClause) {
 	cmd := app.Command("find", "display {{toLower project}} details").
 		Action(c.run)
 
-	cmd.Arg("{{toLower project}}_id", "{{toLower project}} id").
+	cmd.Arg("{{toLower project}} ", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.proj)
+		StringVar(&c.{{toLower project}})
 
-	cmd.Arg("{{toLower parent}}_id", "{{toLower parent}} id").
+	cmd.Arg("{{toLower parent}} ", "{{toLower parent}} slug").
 		Required().
-		Int64Var(&c.{{toLower parent}})
+		StringVar(&c.{{toLower parent}})
 
-	cmd.Arg("{{toLower child}}_id", "{{toLower child}} id").
+	cmd.Arg("{{toLower child}}", "{{toLower child}} slug").
 		Required().
-		Int64Var(&c.{{toLower child}})
+		StringVar(&c.slug)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
-		Default({{toLower project}}Tmpl).
+		Default({{toLower child}}Tmpl).
 		Hidden().
 		StringVar(&c.tmpl)
 }

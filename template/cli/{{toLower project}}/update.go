@@ -5,22 +5,24 @@
 package {{toLower project}}
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
 	"github.com/{{toLower repo}}/cli/util"
 	"github.com/{{toLower repo}}/types"
+	"github.com/gotidy/ptr"
 
 	"github.com/drone/funcmap"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"gopkg.in/guregu/null.v4"
 )
 
 type updateCommand struct {
-	id   int64
+	slug string
 	name string
 	desc string
 	tmpl string
+	json bool
 }
 
 func (c *updateCommand) run(*kingpin.ParseContext) error {
@@ -31,21 +33,26 @@ func (c *updateCommand) run(*kingpin.ParseContext) error {
 
 	in := new(types.{{title project}}Input)
 	if v := c.name; v != "" {
-		in.Name = null.StringFrom(v)
+		in.Name = ptr.String(v)
 	}
 	if v := c.desc; v != "" {
-		in.Desc = null.StringFrom(v)
+		in.Desc = ptr.String(v)
 	}
 
-	{{toLower project}}, err := client.{{title project}}Update(c.id, in)
+	item, err := client.{{title project}}Update(c.slug, in)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, {{toLower project}})
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user update command
@@ -55,15 +62,18 @@ func registerUpdate(app *kingpin.CmdClause) {
 	cmd := app.Command("update", "update a {{toLower project}}").
 		Action(c.run)
 
-	cmd.Arg("id", "{{toLower project}} id").
+	cmd.Arg("slug", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.id)
+		StringVar(&c.slug)
 
 	cmd.Flag("name", "update {{toLower project}} name").
 		StringVar(&c.name)
 
 	cmd.Flag("desc", "update {{toLower project}} description").
 		StringVar(&c.desc)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default({{toLower project}}Tmpl).

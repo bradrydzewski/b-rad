@@ -14,6 +14,7 @@ import (
 	"net/url"
 
 	"github.com/{{toLower repo}}/types"
+	"github.com/{{toLower repo}}/version"
 )
 
 // ensure HTTPClient implements Client interface.
@@ -105,9 +106,9 @@ func (c *HTTPClient) User(key string) (*types.User, error) {
 }
 
 // UserList returns a list of all registered users.
-func (c *HTTPClient) UserList() ([]*types.User, error) {
+func (c *HTTPClient) UserList(params types.Params) ([]*types.User, error) {
 	out := []*types.User{}
-	uri := fmt.Sprintf("%s/api/v1/users", c.base)
+	uri := fmt.Sprintf("%s/api/v1/users?page=%d&per_page=%d", c.base, params.Page, params.Size)
 	err := c.get(uri, &out)
 	return out, err
 }
@@ -139,18 +140,22 @@ func (c *HTTPClient) UserDelete(key string) error {
 // {{title project}} endpoints
 //
 
-// {{title project}} returns a {{toLower project}} by ID.
-func (c *HTTPClient) {{title project}}(id int64) (*types.{{title project}}, error) {
+//
+// {{title project}} endpoints
+//
+
+// {{title project}} returns a {{toLower project}} by slug.
+func (c *HTTPClient) {{title project}}(slug string) (*types.{{title project}}, error) {
 	out := new(types.{{title project}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d", c.base, id)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s", c.base, slug)
 	err := c.get(uri, out)
 	return out, err
 }
 
 // {{title project}}List returns a list of all {{toLower project}}s.
-func (c *HTTPClient) {{title project}}List() ([]*types.{{title project}}, error) {
+func (c *HTTPClient) {{title project}}List(params types.Params) ([]*types.{{title project}}, error) {
 	out := []*types.{{title project}}{}
-	uri := fmt.Sprintf("%s/api/v1/user/{{toLower project}}s", c.base)
+	uri := fmt.Sprintf("%s/api/v1/user/{{toLower project}}s?page=%dper_page=%d", c.base, params.Page, params.Size)
 	err := c.get(uri, &out)
 	return out, err
 }
@@ -164,16 +169,16 @@ func (c *HTTPClient) {{title project}}Create({{toLower project}} *types.{{title 
 }
 
 // {{title project}}Update updates a {{toLower project}}.
-func (c *HTTPClient) {{title project}}Update(id int64, user *types.{{title project}}Input) (*types.{{title project}}, error) {
+func (c *HTTPClient) {{title project}}Update(key string, user *types.{{title project}}Input) (*types.{{title project}}, error) {
 	out := new(types.{{title project}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s", c.base)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s", c.base, key)
 	err := c.patch(uri, user, out)
 	return out, err
 }
 
 // {{title project}}Delete deletes a {{toLower project}}.
-func (c *HTTPClient) {{title project}}Delete(id int64) error {
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d", c.base, id)
+func (c *HTTPClient) {{title project}}Delete(key string) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s", c.base, key)
 	err := c.delete(uri)
 	return err
 }
@@ -182,18 +187,18 @@ func (c *HTTPClient) {{title project}}Delete(id int64) error {
 // Membership endpoints
 //
 
-// Member returns a membrer by ID.
-func (c *HTTPClient) Member({{toLower project}} int64, user string) (*types.Member, error) {
+// Member returns a membrer.
+func (c *HTTPClient) Member({{toLower project}}, user string) (*types.Member, error) {
 	out := new(types.Member)
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, {{toLower project}}, user)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/members/%s", c.base, {{toLower project}}, user)
 	err := c.get(uri, out)
 	return out, err
 }
 
 // MemberList returns a list of all {{toLower project}} members.
-func (c *HTTPClient) MemberList({{toLower project}} int64) ([]*types.Member, error) {
+func (c *HTTPClient) MemberList({{toLower project}} string, params types.Params) ([]*types.Member, error) {
 	out := []*types.Member{}
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members", c.base, {{toLower project}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/members?page=%d&per_page=%d", c.base, {{toLower project}}, params.Page, params.Size)
 	err := c.get(uri, &out)
 	return out, err
 }
@@ -201,7 +206,7 @@ func (c *HTTPClient) MemberList({{toLower project}} int64) ([]*types.Member, err
 // MemberCreate creates a new {{toLower project}} member.
 func (c *HTTPClient) MemberCreate(member *types.MembershipInput) (*types.Member, error) {
 	out := new(types.Member)
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, member.{{title project}}, member.User)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/members/%s", c.base, member.{{title project}}, member.User)
 	err := c.post(uri, member, out)
 	return out, err
 }
@@ -209,14 +214,14 @@ func (c *HTTPClient) MemberCreate(member *types.MembershipInput) (*types.Member,
 // MemberUpdate updates a {{toLower project}} member.
 func (c *HTTPClient) MemberUpdate(member *types.MembershipInput) (*types.Member, error) {
 	out := new(types.Member)
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, member.{{title project}}, member.User)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/members/%s", c.base, member.{{title project}}, member.User)
 	err := c.patch(uri, member, out)
 	return out, err
 }
 
 // MemberDelete deletes a {{toLower project}} member.
-func (c *HTTPClient) MemberDelete({{toLower project}} int64, user string) error {
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/members/%s", c.base, {{toLower project}}, user)
+func (c *HTTPClient) MemberDelete({{toLower project}}, user string) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/members/%s", c.base, {{toLower project}}, user)
 	err := c.delete(uri)
 	return err
 }
@@ -226,40 +231,40 @@ func (c *HTTPClient) MemberDelete({{toLower project}} int64, user string) error 
 //
 
 // {{title parent}} returns a {{toLower parent}} by ID.
-func (c *HTTPClient) {{title parent}}({{toLower project}}, id int64) (*types.{{title parent}}, error) {
+func (c *HTTPClient) {{title parent}}({{toLower project}}, slug string) (*types.{{title parent}}, error) {
 	out := new(types.{{title parent}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d", c.base, {{toLower project}}, id)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s", c.base, {{toLower project}}, slug)
 	err := c.get(uri, out)
 	return out, err
 }
 
 // {{title parent}}List returns a list of all {{toLower parent}}s by {{toLower project}} id.
-func (c *HTTPClient) {{title parent}}List({{toLower project}} int64) ([]*types.{{title parent}}, error) {
+func (c *HTTPClient) {{title parent}}List({{toLower project}} string, params types.Params) ([]*types.{{title parent}}, error) {
 	out := []*types.{{title parent}}{}
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s", c.base, {{toLower project}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s?page=%dper_page=%d", c.base, {{toLower project}}, params.Page, params.Size)
 	err := c.get(uri, &out)
 	return out, err
 }
 
 // {{title parent}}Create creates a new {{toLower parent}}.
-func (c *HTTPClient) {{title parent}}Create({{toLower project}} int64, {{toLower parent}} *types.{{title parent}}) (*types.{{title parent}}, error) {
+func (c *HTTPClient) {{title parent}}Create({{toLower project}} string, {{toLower parent}} *types.{{title parent}}) (*types.{{title parent}}, error) {
 	out := new(types.{{title parent}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s", c.base, {{toLower project}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s", c.base, {{toLower project}})
 	err := c.post(uri, {{toLower parent}}, out)
 	return out, err
 }
 
 // {{title parent}}Update updates a {{toLower parent}}.
-func (c *HTTPClient) {{title parent}}Update({{toLower project}}, id int64, {{toLower parent}} *types.{{title parent}}Input) (*types.{{title parent}}, error) {
+func (c *HTTPClient) {{title parent}}Update({{toLower project}}, slug string, {{toLower parent}} *types.{{title parent}}Input) (*types.{{title parent}}, error) {
 	out := new(types.{{title parent}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d", c.base, {{toLower project}}, id)
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s", c.base, {{toLower project}}, slug)
 	err := c.patch(uri, {{toLower parent}}, out)
 	return out, err
 }
 
 // {{title parent}}Delete deletes a {{toLower parent}}.
-func (c *HTTPClient) {{title parent}}Delete({{toLower project}}, id int64) error {
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d", c.base, {{toLower project}}, id)
+func (c *HTTPClient) {{title parent}}Delete({{toLower project}}, slug string) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s", c.base, {{toLower project}}, slug)
 	err := c.delete(uri)
 	return err
 }
@@ -269,40 +274,40 @@ func (c *HTTPClient) {{title parent}}Delete({{toLower project}}, id int64) error
 //
 
 // {{title child}} returns a {{toLower child}} by ID.
-func (c *HTTPClient) {{title child}}({{toLower project}}, {{toLower parent}}, {{toLower child}} int64) (*types.{{title child}}, error) {
+func (c *HTTPClient) {{title child}}({{toLower project}}, {{toLower parent}}, {{toLower child}} string) (*types.{{title child}}, error) {
 	out := new(types.{{title child}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s/{{toLower child}}s/%s", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
 	err := c.get(uri, out)
 	return out, err
 }
 
 // {{title child}}List returns a list of all {{toLower child}}s by {{toLower project}} id.
-func (c *HTTPClient) {{title child}}List({{toLower project}}, {{toLower parent}} int64) ([]*types.{{title child}}, error) {
+func (c *HTTPClient) {{title child}}List({{toLower project}}, {{toLower parent}} string, params types.Params) ([]*types.{{title child}}, error) {
 	out := []*types.{{title child}}{}
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s", c.base, {{toLower project}}, {{toLower parent}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s/{{toLower child}}s?page=%dper_page=%d", c.base, {{toLower project}}, {{toLower parent}}, params.Page, params.Size)
 	err := c.get(uri, &out)
 	return out, err
 }
 
 // {{title child}}Create creates a new {{toLower child}}.
-func (c *HTTPClient) {{title child}}Create({{toLower project}}, {{toLower parent}} int64, input *types.{{title child}}) (*types.{{title child}}, error) {
+func (c *HTTPClient) {{title child}}Create({{toLower project}}, {{toLower parent}} string, input *types.{{title child}}) (*types.{{title child}}, error) {
 	out := new(types.{{title child}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s", c.base, {{toLower project}}, {{toLower parent}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s/{{toLower child}}s", c.base, {{toLower project}}, {{toLower parent}})
 	err := c.post(uri, input, out)
 	return out, err
 }
 
 // {{title child}}Update updates a {{toLower child}}.
-func (c *HTTPClient) {{title child}}Update({{toLower project}}, {{toLower parent}}, {{toLower child}} int64, input *types.{{title child}}Input) (*types.{{title child}}, error) {
+func (c *HTTPClient) {{title child}}Update({{toLower project}}, {{toLower parent}}, {{toLower child}} string, input *types.{{title child}}Input) (*types.{{title child}}, error) {
 	out := new(types.{{title child}})
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s/{{toLower child}}s/%s", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
 	err := c.patch(uri, input, out)
 	return out, err
 }
 
 // {{title child}}Delete deletes a {{toLower child}}.
-func (c *HTTPClient) {{title child}}Delete({{toLower project}}, {{toLower parent}}, {{toLower child}} int64) error {
-	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%d/{{toLower parent}}s/%d/{{toLower child}}s/%d", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
+func (c *HTTPClient) {{title child}}Delete({{toLower project}}, {{toLower parent}}, {{toLower child}} string) error {
+	uri := fmt.Sprintf("%s/api/v1/{{toLower project}}s/%s/{{toLower parent}}s/%s/{{toLower child}}s/%s", c.base, {{toLower project}}, {{toLower parent}}, {{toLower child}})
 	err := c.delete(uri)
 	return err
 }
@@ -392,6 +397,12 @@ func (c *HTTPClient) stream(rawurl, method string, in, out interface{}) (io.Read
 	if _, ok := in.(*url.Values); ok {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
+
+	// include the client version information in the
+	// http accept header for debugging purposes.
+	req.Header.Set("Accept", "application/json;version="+version.Version.String())
+
+	// send the http request.
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err

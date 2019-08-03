@@ -5,6 +5,7 @@
 package {{toLower parent}}
 
 import (
+	"encoding/json"
 	"os"
 	"text/template"
 
@@ -15,9 +16,10 @@ import (
 )
 
 type findCommand struct {
-	proj int64
-	id   int64
-	tmpl string
+	{{toLower project}} string
+	slug    string
+	tmpl    string
+	json    bool
 }
 
 func (c *findCommand) run(*kingpin.ParseContext) error {
@@ -25,15 +27,20 @@ func (c *findCommand) run(*kingpin.ParseContext) error {
 	if err != nil {
 		return err
 	}
-	proj, err := client.{{title parent}}(c.proj, c.id)
+	item, err := client.{{title parent}}(c.{{toLower project}}, c.slug)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(item)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl + "\n")
 	if err != nil {
 		return err
 	}
-	return tmpl.Execute(os.Stdout, proj)
+	return tmpl.Execute(os.Stdout, item)
 }
 
 // helper function registers the user find command
@@ -43,16 +50,19 @@ func registerFind(app *kingpin.CmdClause) {
 	cmd := app.Command("find", "display {{toLower project}} details").
 		Action(c.run)
 
-	cmd.Arg("{{toLower project}}_id", "{{toLower project}} id").
+	cmd.Arg("{{toLower project}} ", "{{toLower project}} slug").
 		Required().
-		Int64Var(&c.proj)
+		StringVar(&c.{{toLower project}})
 
-	cmd.Arg("{{toLower parent}}_id", "{{toLower parent}} id").
+	cmd.Arg("slug ", "{{toLower parent}} slug").
 		Required().
-		Int64Var(&c.id)
+		StringVar(&c.slug)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
-		Default({{toLower project}}Tmpl).
+		Default({{toLower parent}}Tmpl).
 		Hidden().
 		StringVar(&c.tmpl)
 }

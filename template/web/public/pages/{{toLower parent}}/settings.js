@@ -47,8 +47,8 @@ export default function Settings({ params }) {
 
 	const handleUpdate = () => {
 		const params = {
-			{{toLower project}}: {{toLower project}}.id,
-			{{toLower parent}}: {{toLower parent}}.id,
+			{{toLower project}}: {{toLower project}}.slug,
+			{{toLower parent}}: {{toLower parent}}.slug,
 		};
 		update{{title parent}}(params, {{toLower parent}}Data, fetcher);
 	};
@@ -60,11 +60,11 @@ export default function Settings({ params }) {
 	const handleDelete = () => {
 		if (confirm("Are you sure you want to proceed?")) {
 			const params = {
-				{{toLower project}}: {{toLower project}}.id,
-				{{toLower parent}}: {{toLower parent}}.id,
+				{{toLower project}}: {{toLower project}}.slug,
+				{{toLower parent}}: {{toLower parent}}.slug,
 			};
 			delete{{title parent}}(params, fetcher);
-			setLocation(`/{{toLower project}}s/${{`{`}}{{toLower project}}.id}`);
+			setLocation(`/{{toLower project}}s/${{`{`}}{{toLower project}}.slug}`);
 		}
 	};
 

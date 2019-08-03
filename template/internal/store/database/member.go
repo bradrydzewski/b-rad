@@ -36,8 +36,7 @@ func (s *MemberStore) Find(ctx context.Context, {{toLower project}} int64, user 
 // List returns a list of members.
 func (s *MemberStore) List(ctx context.Context, {{toLower project}} int64, opts types.Params) ([]*types.Member, error) {
 	dst := []*types.Member{}
-	err := s.db.Select(&dst, Params, {{toLower project}})
-	// TODO(bradrydzewski) add limit and offset
+	err := s.db.Select(&dst, Params, {{toLower project}}, limit(opts.Size), offset(opts.Page, opts.Size))
 	return dst, err
 }
 
@@ -83,17 +82,12 @@ INNER JOIN users
 ON members.member_user_id = users.user_id
 WHERE member_{{toLower project}}_id = $1
 ORDER BY users.user_email
+LIMIT $2 OFFSET $3
 `
 
 const memberSelect = memberBase + `
 INNER JOIN users
 ON members.member_user_id = users.user_id
-WHERE member_{{toLower project}}_id = $1
-  AND member_user_id    = $2
-`
-
-const memberDelete = `
-DELETE FROM members
 WHERE member_{{toLower project}}_id = $1
   AND member_user_id    = $2
 `
@@ -111,4 +105,15 @@ UPDATE members
 SET member_role = $1
 WHERE member_{{toLower project}}_id = $2
   AND member_user_id    = $3
+`
+
+const memberDelete = `
+DELETE FROM members
+WHERE member_{{toLower project}}_id = $1
+  AND member_user_id    = $2
+`
+
+const memberDeleteUser = `
+DELETE FROM members
+WHERE member_user_id = $1
 `

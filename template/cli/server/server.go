@@ -8,13 +8,14 @@ import (
 	"context"
 	"os"
 
-	"github.com/{{toLower repo}}/internal/logger"
 	"github.com/{{toLower repo}}/types"
 	"github.com/{{toLower repo}}/version"
 
 	"github.com/joho/godotenv"
 	"github.com/mattn/go-isatty"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/sync/errgroup"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -30,53 +31,64 @@ func (c *command) run(*kingpin.ParseContext) error {
 	// data from the environment.
 	config, err := load()
 	if err != nil {
-		logrus.Fatal(err)
+		log.Fatal().Err(err).
+			Msg("cannot load configuration")
 	}
 
 	// configure the log level
 	setupLogger(config)
 
-	server, err := initServer(config)
+	system, err := initSystem(config)
 	if err != nil {
-		logrus.Fatal(err)
+		log.Fatal().Err(err).
+			Msg("cannot boot server")
 	}
 
-	// create the http server.
-	// server := server.Server{
-	// 	Acme:    config.Server.Acme.Enabled,
-	// 	Addr:    config.Server.Bind,
-	// 	Handler: handler,
-	// }
-
-	logrus.
-		WithField("revision", version.GitCommit).
-		WithField("repository", version.GitRepository).
-		WithField("version", version.Version).
-		Infof("server listening at %s", config.Server.Bind)
+	var g errgroup.Group
 
 	// starts the http server.
-	return server.ListenAndServe(context.Background())
+	g.Go(func() error {
+		log.Info().
+			Str("port", config.Server.Bind).
+			Str("revision", version.GitCommit).
+			Str("repository", version.GitRepository).
+			Stringer("version", version.Version).
+			Msg("server started")
+		return system.server.ListenAndServe(context.Background())
+	})
+
+	// start the purge routine.
+	g.Go(func() error {
+		log.Debug().Msg("starting the nightly subroutine")
+		system.nightly.Run(context.Background())
+		return nil
+	})
+
+	return g.Wait()
 }
 
 // helper function configures the global logger from
 // the loaded configuration.
 func setupLogger(config *types.Config) {
-	logger.L = logrus.NewEntry(
-		logrus.StandardLogger(),
-	)
-
 	// configure the log level
 	switch {
 	case config.Trace:
-		logrus.SetLevel(logrus.TraceLevel)
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
 	case config.Debug:
-		logrus.SetLevel(logrus.DebugLevel)
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
-	// if the terminal is not a tty we should output the
-	// logs in json format
-	if !isatty.IsTerminal(os.Stdout.Fd()) {
-		logrus.SetFormatter(&logrus.JSONFormatter{})
+	// if the terminal is a tty we should output the
+	// logs in pretty format
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		log.Logger = log.Output(
+			zerolog.ConsoleWriter{
+				Out:     os.Stderr,
+				NoColor: false,
+			},
+		)
 	}
 }
 

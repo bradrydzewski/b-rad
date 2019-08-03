@@ -41,7 +41,7 @@ export default function Members({ params }) {
 		memberList,
 		isLoading: isMemberLoading,
 		isError: isMemberErrror,
-	} = useMemberList({{toLower project}} && {{toLower project}}.id);
+	} = useMemberList({{toLower project}} && {{toLower project}}.slug);
 
 	if (isMemberLoading) {
 		return renderLoading();
@@ -64,7 +64,7 @@ export default function Members({ params }) {
 	const handleCreate = () => {
 		const email = emailElem.current.value;
 		const role = roleElem.current.value;
-		createMember({{toLower project}}.id, { email, role }, fetcher).then((member) => {
+		createMember({{toLower project}}.slug, { email, role }, fetcher).then((member) => {
 			emailElem.current.value = "";
 			setOpen(false);
 		});
@@ -76,7 +76,7 @@ export default function Members({ params }) {
 
 	const handleDelete = ({{toLower project}}, user) => {
 		if (confirm("Are you sure you want to proceed?")) {
-			deleteMember({{toLower project}}.id, user.email, fetcher);
+			deleteMember({{toLower project}}.slug, user.email, fetcher);
 		}
 	};
 
@@ -132,7 +132,7 @@ export default function Members({ params }) {
 // render the member information.
 const MemberInfo = ({ member, {{toLower project}}, onDelete }) => {
 	return (
-		<li id={member.id} className={styles.item}>
+		<li id={member.slug} className={styles.item}>
 			<Avatar text={member.email} className={styles.avatar} />
 			<span className={styles.fill}>
 				{member.email} ({member.role})

@@ -5,6 +5,7 @@
 package users
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"text/template"
@@ -14,8 +15,8 @@ import (
 
 	"github.com/dchest/uniuri"
 	"github.com/drone/funcmap"
+	"github.com/gotidy/ptr"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"gopkg.in/guregu/null.v4"
 )
 
 type updateCommand struct {
@@ -26,6 +27,7 @@ type updateCommand struct {
 	passgen bool
 	pass    string
 	tmpl    string
+	json    bool
 }
 
 func (c *updateCommand) run(*kingpin.ParseContext) error {
@@ -36,26 +38,31 @@ func (c *updateCommand) run(*kingpin.ParseContext) error {
 
 	in := new(types.UserInput)
 	if v := c.email; v != "" {
-		in.Username = null.StringFrom(v)
+		in.Username = ptr.String(v)
 	}
 	if v := c.pass; v != "" {
-		in.Password = null.StringFrom(v)
+		in.Password = ptr.String(v)
 	}
 	if v := c.admin; v {
-		in.Admin = null.BoolFrom(v)
+		in.Admin = ptr.Bool(v)
 	}
 	if v := c.demote; v {
-		in.Admin = null.BoolFrom(false)
+		in.Admin = ptr.Bool(false)
 	}
 	if c.passgen {
 		v := uniuri.NewLen(8)
-		in.Password = null.StringFrom(v)
+		in.Password = ptr.String(v)
 		fmt.Printf("generated temporary password: %s\n", v)
 	}
 
 	user, err := client.UserUpdate(c.id, in)
 	if err != nil {
 		return err
+	}
+	if c.json {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(user)
 	}
 	tmpl, err := template.New("_").Funcs(funcmap.Funcs).Parse(c.tmpl)
 	if err != nil {
@@ -89,6 +96,9 @@ func registerUpdate(app *kingpin.CmdClause) {
 
 	cmd.Flag("demote", "demote user from admin").
 		BoolVar(&c.demote)
+
+	cmd.Flag("json", "json encode the output").
+		BoolVar(&c.json)
 
 	cmd.Flag("format", "format the output using a Go template").
 		Default(userTmpl).

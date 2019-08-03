@@ -18,13 +18,13 @@ export const create{{title project}} = async (data, fetcher) => {
  * update{{title project}} updates an existing {{toLower project}}
  */
 export const update{{title project}} = (params, data, fetcher) => {
-	const { id } = params;
-	return fetcher(`${instance}/api/v1/{{toLower project}}s/${id}`, {
+	const { slug } = params;
+	return fetcher(`${instance}/api/v1/{{toLower project}}s/${slug}`, {
 		body: JSON.stringify(data),
 		method: "PATCH",
 	}).then((_) => {
 		mutate(`${instance}/api/v1/user/{{toLower project}}s`);
-		mutate(`${instance}/api/v1/user/{{toLower project}}s/${id}`);
+		mutate(`${instance}/api/v1/user/{{toLower project}}s/${slug}`);
 		return;
 	});
 };
@@ -33,8 +33,8 @@ export const update{{title project}} = (params, data, fetcher) => {
  * delete{{title project}} deletes an existing {{toLower project}}
  */
 export const delete{{title project}} = (params, fetcher) => {
-	const { id } = params;
-	return fetcher(`${instance}/api/v1/{{toLower project}}s/${id}`, {
+	const { slug } = params;
+	return fetcher(`${instance}/api/v1/{{toLower project}}s/${slug}`, {
 		method: "DELETE",
 	}).then((_) => {
 		mutate(`${instance}/api/v1/user/{{toLower project}}s`);
@@ -57,9 +57,9 @@ export const use{{title project}}List = () => {
 /**
  * use{{title project}} returns an swr hook that provides the {{toLower project}}.
  */
-export const use{{title project}} = (id) => {
+export const use{{title project}} = (slug) => {
 	const { data, error } = useSWR(
-		`${instance}/api/v1/{{toLower project}}s/${id}?token=true`
+		`${instance}/api/v1/{{toLower project}}s/${slug}?token=true`
 	);
 	return {
 		{{toLower project}}: data,

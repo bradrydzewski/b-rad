@@ -25,7 +25,7 @@ type Client interface {
 	User(key string) (*types.User, error)
 
 	// UserList returns a list of all registered users.
-	UserList() ([]*types.User, error)
+	UserList(params types.Params) ([]*types.User, error)
 
 	// UserCreate creates a new user account.
 	UserCreate(user *types.User) (*types.User, error)
@@ -36,26 +36,26 @@ type Client interface {
 	// UserDelete deletes a user account by ID or email.
 	UserDelete(key string) error
 
-	// {{title project}} returns a {{toLower project}} by ID.
-	{{title project}}(id int64) (*types.{{title project}}, error)
+	// {{title project}} returns a {{toLower project}} by slug.
+	{{title project}}(slug string) (*types.{{title project}}, error)
 
 	// {{title project}}List returns a list of all {{toLower project}}s.
-	{{title project}}List() ([]*types.{{title project}}, error)
+	{{title project}}List(params types.Params) ([]*types.{{title project}}, error)
 
 	// {{title project}}Create creates a new {{toLower project}}.
 	{{title project}}Create(user *types.{{title project}}) (*types.{{title project}}, error)
 
 	// {{title project}}Update updates a {{toLower project}}.
-	{{title project}}Update(id int64, input *types.{{title project}}Input) (*types.{{title project}}, error)
+	{{title project}}Update(slug string, input *types.{{title project}}Input) (*types.{{title project}}, error)
 
 	// {{title project}}Delete deletes a {{toLower project}}.
-	{{title project}}Delete(id int64) error
+	{{title project}}Delete(slug string) error
 
-	// Member returns a membrer by ID.
-	Member({{toLower project}} int64, user string) (*types.Member, error)
+	// Member returns a member.
+	Member({{toLower project}}, user string) (*types.Member, error)
 
 	// MemberList returns a list of all {{toLower project}} members.
-	MemberList({{toLower project}} int64) ([]*types.Member, error)
+	MemberList({{toLower project}} string, params types.Params) ([]*types.Member, error)
 
 	// MemberCreate creates a new {{toLower project}} member.
 	MemberCreate(member *types.MembershipInput) (*types.Member, error)
@@ -64,37 +64,37 @@ type Client interface {
 	MemberUpdate(member *types.MembershipInput) (*types.Member, error)
 
 	// MemberDelete deletes a {{toLower project}} member.
-	MemberDelete({{toLower project}} int64, user string) error
+	MemberDelete({{toLower project}}, user string) error
 
-	// {{title parent}} returns a {{toLower parent}} by ID.
-	{{title parent}}({{toLower project}}, id int64) (*types.{{title parent}}, error)
+	// {{title parent}} returns a {{toLower parent}} by {{toLower project}} and slug.
+	{{title parent}}({{toLower project}}, slug string) (*types.{{title parent}}, error)
 
-	// {{title parent}}List returns a list of all {{toLower parent}}s by {{toLower project}} id.
-	{{title parent}}List({{toLower project}} int64) ([]*types.{{title parent}}, error)
+	// {{title parent}}List returns a list of all {{toLower parent}}s by {{toLower project}} slug.
+	{{title parent}}List({{toLower project}} string, params types.Params) ([]*types.{{title parent}}, error)
 
 	// {{title parent}}Create creates a new {{toLower parent}}.
-	{{title parent}}Create({{toLower project}} int64, {{toLower parent}} *types.{{title parent}}) (*types.{{title parent}}, error)
+	{{title parent}}Create({{toLower project}} string, {{toLower parent}} *types.{{title parent}}) (*types.{{title parent}}, error)
 
 	// {{title parent}}Update updates a {{toLower parent}}.
-	{{title parent}}Update({{toLower project}}, id int64, input *types.{{title parent}}Input) (*types.{{title parent}}, error)
+	{{title parent}}Update({{toLower project}}, slug string, input *types.{{title parent}}Input) (*types.{{title parent}}, error)
 
 	// {{title parent}}Delete deletes a {{toLower parent}}.
-	{{title parent}}Delete({{toLower project}}, id int64) error
+	{{title parent}}Delete({{toLower project}}, slug string) error
 
-	// {{title child}} returns a {{toLower child}} by ID.
-	{{title child}}({{toLower project}}, {{toLower parent}}, {{toLower child}} int64) (*types.{{title child}}, error)
+	// {{title child}} returns a {{toLower child}} by slug.
+	{{title child}}({{toLower project}}, {{toLower parent}}, {{toLower child}} string) (*types.{{title child}}, error)
 
-	// {{title child}}List returns a list of all {{toLower child}}s by {{toLower project}} id.
-	{{title child}}List({{toLower project}}, {{toLower parent}} int64) ([]*types.{{title child}}, error)
+	// {{title child}}List returns a list of all {{toLower child}}s by {{toLower project}}.
+	{{title child}}List({{toLower project}}, {{toLower parent}} string, params types.Params) ([]*types.{{title child}}, error)
 
 	// {{title child}}Create creates a new {{toLower child}}.
-	{{title child}}Create({{toLower project}}, {{toLower parent}} int64, input *types.{{title child}}) (*types.{{title child}}, error)
+	{{title child}}Create({{toLower project}}, {{toLower parent}} string, input *types.{{title child}}) (*types.{{title child}}, error)
 
 	// {{title child}}Update updates a {{toLower child}}.
-	{{title child}}Update({{toLower project}}, {{toLower parent}}, {{toLower child}} int64, input *types.{{title child}}Input) (*types.{{title child}}, error)
+	{{title child}}Update({{toLower project}}, {{toLower parent}}, {{toLower child}} string, input *types.{{title child}}Input) (*types.{{title child}}, error)
 
 	// {{title child}}Delete deletes a {{toLower child}}.
-	{{title child}}Delete({{toLower project}}, {{toLower parent}}, {{toLower child}} int64) error
+	{{title child}}Delete({{toLower project}}, {{toLower parent}}, {{toLower child}} string) error
 }
 
 // remoteError store the error payload returned

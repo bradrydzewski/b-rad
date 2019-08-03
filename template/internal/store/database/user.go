@@ -10,6 +10,7 @@ import (
 
 	"github.com/{{toLower repo}}/internal/store"
 	"github.com/{{toLower repo}}/types"
+	"github.com/{{toLower repo}}/types/enum"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -51,47 +52,52 @@ func (s *UserStore) FindKey(ctx context.Context, key string) (*types.User, error
 	}
 }
 
-// FindToken finds the user by token.
-func (s *UserStore) FindToken(ctx context.Context, token string) (*types.User, error) {
-	dst := new(types.User)
-	err := s.db.Get(dst, userSelectToken, token)
-	return dst, err
-}
-
 // List returns a list of users.
-func (s *UserStore) List(ctx context.Context, opts types.Params) ([]*types.User, error) {
+func (s *UserStore) List(ctx context.Context, opts types.UserFilter) ([]*types.User, error) {
 	dst := []*types.User{}
-	err := s.db.Select(&dst, userSelect)
-	// TODO(bradrydzewski) add limit and offset
+
+	// if the user does not provide any customer filter
+	// or sorting we use the default select statement.
+	if opts.Sort == enum.UserAttrNone {
+		err := s.db.Select(&dst, userSelect, limit(opts.Size), offset(opts.Page, opts.Size))
+		return dst, err
+	}
+
+	// else we construct the sql statement.
+	stmt := builder.Select("*").From("users")
+	stmt = stmt.Limit(uint64(limit(opts.Size)))
+	stmt = stmt.Offset(uint64(offset(opts.Page, opts.Size)))
+
+	switch opts.Sort {
+	case enum.UserAttrCreated:
+		// NOTE: string concatination is safe because the
+		// order attribute is an enum and is not user-defined,
+		// and is therefore not subject to injection attacks.
+		stmt = stmt.OrderBy("user_id " + opts.Order.String())
+	case enum.UserAttrUpdated:
+		stmt = stmt.OrderBy("user_updated " + opts.Order.String())
+	case enum.UserAttrEmail:
+		stmt = stmt.OrderBy("user_email " + opts.Order.String())
+	case enum.UserAttrId:
+		stmt = stmt.OrderBy("user_id " + opts.Order.String())
+	}
+
+	sql, _, err := stmt.ToSql()
+	if err != nil {
+		return dst, err
+	}
+
+	err = s.db.Select(&dst, sql)
 	return dst, err
 }
 
 // Create saves the user details.
 func (s *UserStore) Create(ctx context.Context, user *types.User) error {
-	query := userInsert
-
-	if s.db.DriverName() == "postgres" {
-		query = userInsertPg
-	}
-
-	query, arg, err := s.db.BindNamed(query, user)
+	query, arg, err := s.db.BindNamed(userInsert, user)
 	if err != nil {
 		return err
 	}
-
-	if s.db.DriverName() == "postgres" {
-		return s.db.QueryRow(query, arg...).Scan(&user.ID)
-	}
-
-	res, err := s.db.Exec(query, arg...)
-	if err != nil {
-		return err
-	}
-	user.ID, err = res.LastInsertId()
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.db.QueryRow(query, arg...).Scan(&user.ID)
 }
 
 // Update updates the user details.
@@ -106,8 +112,20 @@ func (s *UserStore) Update(ctx context.Context, user *types.User) error {
 
 // Delete deletes the user.
 func (s *UserStore) Delete(ctx context.Context, user *types.User) error {
-	_, err := s.db.Exec(userDelete, user.ID)
-	return err
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	// delete the members associated with the user
+	if _, err := tx.Exec(memberDeleteUser, user.ID); err != nil {
+		return err
+	}
+	// delete the user
+	if _, err := tx.Exec(userDelete, user.ID); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 // Count returns a count of users.
@@ -129,7 +147,7 @@ SELECT
 ,user_name
 ,user_company
 ,user_password
-,user_token
+,user_salt
 ,user_admin
 ,user_blocked
 ,user_created
@@ -140,6 +158,7 @@ FROM users
 
 const userSelect = userBase + `
 ORDER BY user_email ASC
+LIMIT $1 OFFSET $2
 `
 
 const userSelectID = userBase + `
@@ -151,7 +170,7 @@ WHERE user_email = $1
 `
 
 const userSelectToken = userBase + `
-WHERE user_token = $1
+WHERE user_salt = $1
 `
 
 const userDelete = `
@@ -165,7 +184,7 @@ INSERT INTO users (
 ,user_name
 ,user_company
 ,user_password
-,user_token
+,user_salt
 ,user_admin
 ,user_blocked
 ,user_created
@@ -176,17 +195,13 @@ INSERT INTO users (
 ,:user_name
 ,:user_company
 ,:user_password
-,:user_token
+,:user_salt
 ,:user_admin
 ,:user_blocked
 ,:user_created
 ,:user_updated
 ,:user_authed
-)
-`
-
-const userInsertPg = userInsert + `
-RETURNING user_id
+) RETURNING user_id
 `
 
 const userUpdate = `
@@ -196,7 +211,7 @@ SET
 ,user_name      = :user_name
 ,user_company   = :user_company
 ,user_password  = :user_password
-,user_token     = :user_token
+,user_salt     = :user_salt
 ,user_admin     = :user_admin
 ,user_blocked   = :user_blocked
 ,user_created   = :user_created

@@ -10,25 +10,27 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/{{toLower repo}}/internal/api/access"
-	"github.com/{{toLower repo}}/internal/api/{{toLower parent}}s"
-	"github.com/{{toLower repo}}/internal/api/login"
-	"github.com/{{toLower repo}}/internal/api/members"
-	"github.com/{{toLower repo}}/internal/api/{{toLower project}}s"
-	"github.com/{{toLower repo}}/internal/api/register"
-	"github.com/{{toLower repo}}/internal/api/{{toLower child}}s"
-	"github.com/{{toLower repo}}/internal/api/system"
-	"github.com/{{toLower repo}}/internal/api/token"
-	"github.com/{{toLower repo}}/internal/api/user"
-	"github.com/{{toLower repo}}/internal/api/users"
-	"github.com/{{toLower repo}}/internal/logger"
+	"github.com/{{toLower repo}}/internal/api/handler/account"
+	"github.com/{{toLower repo}}/internal/api/handler/{{toLower parent}}s"
+	"github.com/{{toLower repo}}/internal/api/handler/members"
+	"github.com/{{toLower repo}}/internal/api/handler/{{toLower project}}s"
+	"github.com/{{toLower repo}}/internal/api/handler/{{toLower child}}s"
+	"github.com/{{toLower repo}}/internal/api/handler/system"
+	"github.com/{{toLower repo}}/internal/api/handler/user"
+	"github.com/{{toLower repo}}/internal/api/handler/users"
+	"github.com/{{toLower repo}}/internal/api/middleware/access"
+	"github.com/{{toLower repo}}/internal/api/middleware/address"
+	"github.com/{{toLower repo}}/internal/api/middleware/token"
+	"github.com/{{toLower repo}}/internal/api/openapi"
 	"github.com/{{toLower repo}}/internal/store"
-	"github.com/{{toLower repo}}/internal/swagger"
 	"github.com/{{toLower repo}}/web/dist"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/rs/zerolog/hlog"
+	"github.com/rs/zerolog/log"
+	"github.com/swaggest/swgui/v3emb"
 	"github.com/unrolled/secure"
 )
 
@@ -60,8 +62,23 @@ func New(
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Use(middleware.NoCache)
 		r.Use(middleware.Recoverer)
-		r.Use(logger.Middleware)
 
+		// configure middleware to help ascertain the true
+		// server address from the incoming http.Request
+		r.Use(
+			address.Handler(
+				config.Server.Proto,
+				config.Server.Host,
+			),
+		)
+
+		// configure logging middleware.
+		r.Use(hlog.NewHandler(log.Logger))
+		r.Use(hlog.URLHandler("path"))
+		r.Use(hlog.MethodHandler("method"))
+		r.Use(hlog.RequestIDHandler("request", "Request-Id"))
+
+		// configure cors middleware
 		cors := cors.New(
 			cors.Options{
 				AllowedOrigins:   config.Cors.AllowedOrigins,
@@ -81,7 +98,7 @@ func New(
 
 			// {{toLower project}} endpoints
 			r.Route("/{{`{`}}{{toLower project}}{{`}`}}", func(r chi.Router) {
-				r.Use(access.{{title project}}Access(memberStore))
+				r.Use(access.{{title project}}Access({{toLower project}}Store, memberStore))
 
 				r.Get("/", {{toLower project}}s.HandleFind({{toLower project}}Store, memberStore))
 				r.Patch("/", {{toLower project}}s.HandleUpdate({{toLower project}}Store))
@@ -89,23 +106,23 @@ func New(
 
 				// {{toLower parent}} endpoints
 				r.Route("/{{toLower parent}}s", func(r chi.Router) {
-					r.Get("/", {{toLower parent}}s.HandleList({{toLower parent}}Store))
-					r.Post("/", {{toLower parent}}s.HandleCreate({{toLower parent}}Store))
-					r.Get("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleFind({{toLower parent}}Store))
-					r.Patch("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleUpdate({{toLower parent}}Store))
+					r.Get("/", {{toLower parent}}s.HandleList({{toLower project}}Store, {{toLower parent}}Store))
+					r.Post("/", {{toLower parent}}s.HandleCreate({{toLower project}}Store, {{toLower parent}}Store))
+					r.Get("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleFind({{toLower project}}Store, {{toLower parent}}Store))
+					r.Patch("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleUpdate({{toLower project}}Store, {{toLower parent}}Store))
 					r.With(
 						access.{{title project}}Admin(memberStore),
-					).Delete("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleDelete({{toLower parent}}Store))
+					).Delete("/{{`{`}}{{toLower parent}}{{`}`}}", {{toLower parent}}s.HandleDelete({{toLower project}}Store, {{toLower parent}}Store))
 
 					// {{toLower child}} endpoints
 					r.Route("/{{`{`}}{{toLower parent}}{{`}`}}/{{toLower child}}s", func(r chi.Router) {
-						r.Get("/", {{toLower child}}s.HandleList({{toLower parent}}Store, {{toLower child}}Store))
-						r.Post("/", {{toLower child}}s.HandleCreate({{toLower parent}}Store, {{toLower child}}Store))
-						r.Get("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleFind({{toLower parent}}Store, {{toLower child}}Store))
-						r.Patch("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleUpdate({{toLower parent}}Store, {{toLower child}}Store))
+						r.Get("/", {{toLower child}}s.HandleList({{toLower project}}Store, {{toLower parent}}Store, {{toLower child}}Store))
+						r.Post("/", {{toLower child}}s.HandleCreate({{toLower project}}Store, {{toLower parent}}Store, {{toLower child}}Store))
+						r.Get("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleFind({{toLower project}}Store, {{toLower parent}}Store, {{toLower child}}Store))
+						r.Patch("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleUpdate({{toLower project}}Store, {{toLower parent}}Store, {{toLower child}}Store))
 						r.With(
 							access.{{title project}}Admin(memberStore),
-						).Delete("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleDelete({{toLower parent}}Store, {{toLower child}}Store))
+						).Delete("/{{`{`}}{{toLower child}}{{`}`}}", {{toLower child}}s.HandleDelete({{toLower project}}Store, {{toLower parent}}Store, {{toLower child}}Store))
 					})
 				})
 
@@ -151,15 +168,21 @@ func New(
 		})
 
 		// user login endpoint
-		r.Post("/login", login.HandleLogin(userStore, systemStore))
+		r.Post("/login", account.HandleLogin(userStore, systemStore))
 
 		// user registration endpoint
-		r.Post("/register", register.HandleRegister(userStore, systemStore))
+		r.Post("/register", account.HandleRegister(userStore, systemStore))
+
+		// openapi specification endpoints
+		swagger := openapi.Handler()
+		r.Handle("/swagger.json", swagger)
+		r.Handle("/swagger.yaml", swagger)
 	})
 
-	// serve swagger for embedded filesystem.
-	r.Handle("/swagger", http.RedirectHandler("/swagger/", http.StatusSeeOther))
-	r.Handle("/swagger/*", http.StripPrefix("/swagger/", swagger.Handler()))
+	// openapi playground endpoints
+	swagger := v3emb.NewHandler("API Definition", "/api/v1/swagger.yaml", "/swagger")
+	r.Handle("/swagger", swagger)
+	r.Handle("/swagger/*", swagger)
 
 	// create middleware to enforce security best practices.
 	sec := secure.New(

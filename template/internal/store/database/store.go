@@ -12,8 +12,13 @@ import (
 
 	"github.com/{{toLower repo}}/internal/store/database/migrate"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 )
+
+// build is a global instance of the sql builder. we are able to
+// hardcode to postgres since sqlite3 is compatible with postgres.
+var builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 // Connect to a database and verify with a ping.
 func Connect(driver, datasource string) (*sqlx.DB, error) {

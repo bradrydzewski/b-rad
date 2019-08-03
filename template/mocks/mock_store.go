@@ -77,6 +77,21 @@ func (mr *Mock{{title child}}StoreMockRecorder) Find(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*Mock{{title child}}Store)(nil).Find), arg0, arg1)
 }
 
+// FindSlug mocks base method
+func (m *Mock{{title child}}Store) FindSlug(arg0 context.Context, arg1 int64, arg2 string) (*types.{{title child}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSlug", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*types.{{title child}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSlug indicates an expected call of FindSlug
+func (mr *Mock{{title child}}StoreMockRecorder) FindSlug(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSlug", reflect.TypeOf((*Mock{{title child}}Store)(nil).FindSlug), arg0, arg1, arg2)
+}
+
 // List mocks base method
 func (m *Mock{{title child}}Store) List(arg0 context.Context, arg1 int64, arg2 types.Params) ([]*types.{{title child}}, error) {
 	m.ctrl.T.Helper()
@@ -170,6 +185,21 @@ func (m *Mock{{title parent}}Store) Find(arg0 context.Context, arg1 int64) (*typ
 func (mr *Mock{{title parent}}StoreMockRecorder) Find(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*Mock{{title parent}}Store)(nil).Find), arg0, arg1)
+}
+
+// FindSlug mocks base method
+func (m *Mock{{title parent}}Store) FindSlug(arg0 context.Context, arg1 int64, arg2 string) (*types.{{title parent}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSlug", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*types.{{title parent}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSlug indicates an expected call of FindSlug
+func (mr *Mock{{title parent}}StoreMockRecorder) FindSlug(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSlug", reflect.TypeOf((*Mock{{title parent}}Store)(nil).FindSlug), arg0, arg1, arg2)
 }
 
 // List mocks base method
@@ -360,6 +390,21 @@ func (m *Mock{{title project}}Store) Find(arg0 context.Context, arg1 int64) (*ty
 func (mr *Mock{{title project}}StoreMockRecorder) Find(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*Mock{{title project}}Store)(nil).Find), arg0, arg1)
+}
+
+// FindSlug mocks base method
+func (m *Mock{{title project}}Store) FindSlug(arg0 context.Context, arg1 string) (*types.{{title project}}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSlug", arg0, arg1)
+	ret0, _ := ret[0].(*types.{{title project}})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSlug indicates an expected call of FindSlug
+func (mr *Mock{{title project}}StoreMockRecorder) FindSlug(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSlug", reflect.TypeOf((*Mock{{title project}}Store)(nil).FindSlug), arg0, arg1)
 }
 
 // FindToken mocks base method
@@ -555,7 +600,7 @@ func (mr *MockUserStoreMockRecorder) FindKey(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // List mocks base method
-func (m *MockUserStore) List(arg0 context.Context, arg1 types.Params) ([]*types.User, error) {
+func (m *MockUserStore) List(arg0 context.Context, arg1 types.UserFilter) ([]*types.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", arg0, arg1)
 	ret0, _ := ret[0].([]*types.User)

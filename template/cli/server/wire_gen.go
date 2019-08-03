@@ -6,6 +6,7 @@
 package server
 
 import (
+	"github.com/{{toLower repo}}/internal/cron"
 	"github.com/{{toLower repo}}/internal/router"
 	"github.com/{{toLower repo}}/internal/server"
 	"github.com/{{toLower repo}}/internal/store/database"
@@ -15,7 +16,7 @@ import (
 
 // Injectors from wire.go:
 
-func initServer(config *types.Config) (*server.Server, error) {
+func initSystem(config *types.Config) (*system, error) {
 	db, err := database.ProvideDatabase(config)
 	if err != nil {
 		return nil, err
@@ -28,5 +29,7 @@ func initServer(config *types.Config) (*server.Server, error) {
 	systemStore := memory.New(config)
 	handler := router.New({{toLower child}}Store, {{toLower parent}}Store, memberStore, {{toLower project}}Store, userStore, systemStore)
 	serverServer := server.ProvideServer(config, handler)
-	return serverServer, nil
+	nightly := cron.NewNightly()
+	serverSystem := newSystem(serverServer, nightly)
+	return serverSystem, nil
 }

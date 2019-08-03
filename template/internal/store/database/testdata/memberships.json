@@ -1,0 +1,17 @@
+[
+    {
+        "{{toLower project}}": 1,
+        "user": 1,
+        "role": "developer"
+    },
+    {
+        "{{toLower project}}": 1,
+        "user": 2,
+        "role": "admin"
+    },
+    {
+        "{{toLower project}}": 2,
+        "user": 2,
+        "role": "admin"
+    }
+]

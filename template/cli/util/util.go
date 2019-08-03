@@ -16,9 +16,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/adrg/xdg"
 	"github.com/{{toLower repo}}/client"
 	"github.com/{{toLower repo}}/types"
+
+	"github.com/adrg/xdg"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

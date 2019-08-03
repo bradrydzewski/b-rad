@@ -6,12 +6,24 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/{{toLower repo}}/internal/store"
 	"github.com/{{toLower repo}}/types"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/jmoiron/sqlx"
 )
 
-func TestUserCount(t *testing.T) {
+// user fields to ignore in test comparisons
+var userIgnore = cmpopts.IgnoreFields(types.User{},
+	"ID", "Salt", "Created", "Updated")
+
+func TestUser(t *testing.T) {
 	db, err := connect()
 	if err != nil {
 		t.Error(err)
@@ -23,246 +35,238 @@ func TestUserCount(t *testing.T) {
 		return
 	}
 
-	users := NewUserStoreSync(NewUserStore(db))
-	count, err := users.Count(noContext)
-	if err != nil {
-		t.Error(err)
-	}
-	if got, want := count, int64(2); got != want {
-		t.Errorf("Want count %d, got %d", want, got)
+	store := NewUserStoreSync(NewUserStore(db))
+	t.Run("create", testUserCreate(store))
+	t.Run("duplicate", testUserDuplicate(store))
+	t.Run("count", testUserCount(store))
+	t.Run("find", testUserFind(store))
+	t.Run("list", testUserList(store))
+	t.Run("update", testUserUpdate(store))
+	t.Run("delete", testUserDelete(store))
+}
+
+// this test creates entries in the database and confirms
+// the primary keys were auto-incremented.
+func testUserCreate(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		vv := []*types.User{}
+		if err := unmarshal("testdata/users.json", &vv); err != nil {
+			t.Error(err)
+			return
+		}
+		// create row 1
+		v := vv[0]
+		// generate a deterministic token for each
+		// entry based on the hash of the email.
+		v.Salt = fmt.Sprintf("%x", v.Email)
+		if err := store.Create(noContext, v); err != nil {
+			t.Error(err)
+			return
+		}
+		if v.ID == 0 {
+			t.Errorf("Want autoincremented primary key")
+		}
+		// create row 2
+		v = vv[1]
+		v.Salt = fmt.Sprintf("%x", v.Email)
+		if err := store.Create(noContext, v); err != nil {
+			t.Error(err)
+			return
+		}
+		if v.ID == 0 {
+			t.Errorf("Want autoincremented primary key")
+		}
 	}
 }
 
-func TestUserFindID(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	user, err := users.Find(noContext, 1)
-	if err != nil {
-		t.Error(err)
-	}
-	if got, want := user.Email, "jane@example.com"; want != got {
-		t.Errorf("Want email %q, got %q", want, got)
+// this test attempts to create an entry in the database using
+// a duplicate email to verify that unique email constraints are
+// being enforced.
+func testUserDuplicate(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		vv := []*types.User{}
+		if err := unmarshal("testdata/users.json", &vv); err != nil {
+			t.Error(err)
+			return
+		}
+		if err := store.Create(noContext, vv[0]); err == nil {
+			t.Errorf("Expect unique index violation")
+		}
 	}
 }
 
-func TestUserFindEmail(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	user, err := users.FindEmail(noContext, "jane@example.com")
-	if err != nil {
-		t.Error(err)
-	}
-	if got, want := user.Email, "jane@example.com"; want != got {
-		t.Errorf("Want email %q, got %q", want, got)
+// this test counts the number of users in the database
+// and compares to the expected count.
+func testUserCount(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		got, err := store.Count(noContext)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		if want := int64(2); got != want {
+			t.Errorf("Want user count %d, got %d", want, got)
+		}
 	}
 }
 
-func TestUserFindToken(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
+// this test fetches users from the database by id and key
+// and compares to the expected results (sourced from a json file)
+// to ensure all columns are correctly mapped.
+func testUserFind(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		vv := []*types.User{}
+		if err := unmarshal("testdata/users.json", &vv); err != nil {
+			t.Error(err)
+			return
+		}
+		want := vv[0]
 
-	users := NewUserStoreSync(NewUserStore(db))
-	user, err := users.FindToken(noContext, "12345")
-	if err != nil {
-		t.Error(err)
-	}
-	if got, want := user.Email, "jane@example.com"; want != got {
-		t.Errorf("Want email %q, got %q", want, got)
+		t.Run("id", func(t *testing.T) {
+			got, err := store.Find(noContext, 1)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if diff := cmp.Diff(got, want, userIgnore); len(diff) != 0 {
+				t.Errorf(diff)
+				return
+			}
+		})
+
+		t.Run("email", func(t *testing.T) {
+			got, err := store.FindEmail(noContext, want.Email)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if diff := cmp.Diff(got, want, userIgnore); len(diff) != 0 {
+				t.Errorf(diff)
+				return
+			}
+		})
+
+		t.Run("email/nocase", func(t *testing.T) {
+			got, err := store.FindEmail(noContext, strings.ToUpper(want.Email))
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if diff := cmp.Diff(got, want, userIgnore); len(diff) != 0 {
+				t.Errorf(diff)
+				return
+			}
+		})
+
+		t.Run("key/id", func(t *testing.T) {
+			got, err := store.FindKey(noContext, "1")
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if diff := cmp.Diff(got, want, userIgnore); len(diff) != 0 {
+				t.Errorf(diff)
+				return
+			}
+		})
+
+		t.Run("key/email", func(t *testing.T) {
+			got, err := store.FindKey(noContext, want.Email)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			if diff := cmp.Diff(got, want, userIgnore); len(diff) != 0 {
+				t.Errorf(diff)
+				return
+			}
+		})
 	}
 }
 
-func TestUserFindEmailNocase(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	user, err := users.FindEmail(noContext, "JANE@EXAMPLE.COM")
-	if err != nil {
-		t.Error(err)
-	}
-	if got, want := user.Email, "jane@example.com"; want != got {
-		t.Errorf("Want email %q, got %q", want, got)
-	}
-}
-
-func TestUserList(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	results, err := users.List(noContext, types.Params{})
-	if err != nil {
-		t.Error(err)
-	}
-	if got, want := len(results), 2; got != want {
-		t.Errorf("Want %d users, got %d", want, got)
-	}
-	if got, want := results[0].Email, "jane@example.com"; want != got {
-		t.Errorf("Want email %q, got %q", want, got)
-	}
-	if got, want := results[1].Email, "john@example.com"; want != got {
-		t.Errorf("Want email %q, got %q", want, got)
+// this test fetches a list of users from the database
+// and compares to the expected results (sourced from a json file)
+// to ensure all columns are correctly mapped.
+func testUserList(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		want := []*types.User{}
+		if err := unmarshal("testdata/users.json", &want); err != nil {
+			t.Error(err)
+			return
+		}
+		got, err := store.List(noContext, types.UserFilter{Page: 0, Size: 100})
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		if diff := cmp.Diff(got, want, userIgnore); len(diff) != 0 {
+			t.Errorf(diff)
+			return
+		}
 	}
 }
 
-func TestUserCreate(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
+// this test updates an user in the database and then fetches
+// the user and confirms the column was updated as expected.
+func testUserUpdate(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		before, err := store.Find(noContext, 1)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		before.Updated = time.Now().Unix()
+		before.Authed = time.Now().Unix()
+		if err := store.Update(noContext, before); err != nil {
+			t.Error(err)
+			return
+		}
+		after, err := store.Find(noContext, 1)
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-	users := NewUserStoreSync(NewUserStore(db))
-	user := &types.User{
-		Email:   "jess@example.com",
-		Token:   "8277e0910d750195b448797616e091ad",
-		Admin:   true,
-		Blocked: false,
-		Created: 915148700,
-		Updated: 915148800,
-		Authed:  915148900,
-	}
-	if err := users.Create(noContext, user); err != nil {
-		t.Error(err)
-		return
+		if diff := cmp.Diff(before, after, userIgnore); len(diff) != 0 {
+			t.Errorf(diff)
+			return
+		}
 	}
 }
 
-func TestUserUniqueIndexEmail(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	user := &types.User{
-		Email:   "jane@example.com",
-		Token:   "8277e0910d750195b448797616e091ad",
-		Admin:   true,
-		Blocked: false,
-		Created: 915148700,
-		Updated: 915148800,
-		Authed:  915148900,
-	}
-	if err := users.Create(noContext, user); err == nil {
-		t.Errorf("Expect unique index violation")
+// this test deletes an user from the database and then confirms
+// subsequent attempts to fetch the deleted user result in
+// a sql.ErrNoRows error.
+func testUserDelete(store store.UserStore) func(t *testing.T) {
+	return func(t *testing.T) {
+		v, err := store.Find(noContext, 1)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		if err := store.Delete(noContext, v); err != nil {
+			t.Error(err)
+			return
+		}
+		if _, err := store.Find(noContext, 1); err != sql.ErrNoRows {
+			t.Errorf("Expected sql.ErrNoRows got %s", err)
+		}
 	}
 }
 
-func TestUserUpdate(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
+// helper function that returns an user store that is seeded
+// with user data loaded from a json file.
+func newUserStoreSeeded(db *sqlx.DB) (store.UserStore, error) {
+	store := NewUserStoreSync(NewUserStore(db))
+	vv := []*types.User{}
+	if err := unmarshal("testdata/users.json", &vv); err != nil {
+		return nil, err
 	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
+	for _, v := range vv {
+		v.Salt = fmt.Sprintf("%x", v.Email)
+		if err := store.Create(noContext, v); err != nil {
+			return nil, err
+		}
 	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	user, err := users.Find(noContext, 1)
-	if err != nil {
-		t.Error(err)
-	}
-
-	user.Email = "noreply@example.com"
-	err = users.Update(noContext, user)
-	if err != nil {
-		t.Error(err)
-	}
-
-	updated, err := users.Find(noContext, user.ID)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if got, want := updated.Email, user.Email; got != want {
-		t.Errorf("Want email %q, got %q", want, got)
-	}
-}
-
-func TestUserDelete(t *testing.T) {
-	db, err := connect()
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	defer db.Close()
-	if err := seed(db); err != nil {
-		t.Error(err)
-		return
-	}
-
-	users := NewUserStoreSync(NewUserStore(db))
-	user, err := users.Find(noContext, 1)
-	if err != nil {
-		t.Error(err)
-	}
-
-	err = users.Delete(noContext, user)
-	if err != nil {
-		t.Error(err)
-	}
-
-	_, err = users.Find(noContext, 1)
-	if err != sql.ErrNoRows {
-		t.Errorf("Expected ErrNoRows, got %v", err)
-	}
+	return store, nil
 }
